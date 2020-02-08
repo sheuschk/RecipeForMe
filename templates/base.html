@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <title>{%- block title %}{%- endblock title %}</title>
 </head>
 <body>
+<header>{%- block header %} {%-  endblock header %}</header>
+{%- block content %}
 
+{%- endblock content %}
 </body>
 </html>
