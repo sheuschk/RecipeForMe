@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %} Home {% endblock %}
+{% block header %} Create Cocktails{% endblock %}
+{% block content %}
+ <form action="" method="post" novalidate>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name(size=32) }}
+        {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.desc.label }}<br>
+        {{ form.desc(size=140) }}
+        {% for error in form.desc.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+     <p>
+        {{ form.ing_name_1.label }}<br>
+        {{ form.ing_name_1(size=32) }}
+         {% for error in form.ing_name_1.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+     <p>
+        {{ form.quantity_1.label }}<br>
+        {{ form.quantity_1(size=32) }}
+         {% for error in form.quantity_1.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit() }}</p>
+ </form>
+
+{% endblock %}

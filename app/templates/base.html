@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{%- block title %}{%- endblock title %}</title>
+</head>
+<body>
+<nav>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('create') }}">Create</a>
+</nav>
+<hr>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {%  endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+<header><h1>{%- block header %} {%-  endblock header %}</h1></header>
+{%- block content %}
+
+{%- endblock content %}
+<footer>
+    <script src='../static/js/jQuery.js'></script>
+    <script src='../static/js/app.js'></script>
+    {% block javascript %}{% endblock %}
+</footer>
+</body>
+</html>
