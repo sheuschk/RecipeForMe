@@ -1,6 +1,7 @@
 /* Javascript for app*/
 window.addEventListener('load', function () {
     "use strict";
+
     $('#name').change(function () {
         let name = $(this).val();
         $.ajax({
@@ -13,6 +14,11 @@ window.addEventListener('load', function () {
                 }
             }
         })
-    })
+    });
+
+    let all_ings = document.querySelectorAll('.ing_wrapper');
+    for (let ing of all_ings) {
+        ing.style.visibility = "hidden";
+    }
 
 });

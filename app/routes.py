@@ -25,6 +25,13 @@ def create():
         desc = form.desc.data
         ing_1 = form.ing_name_1.data
         quant_1 = form.quantity_1.data
+        ing_2 = form.ing_name_2.data
+        quant_2 = form.quantity_2.data
+        ingredients = form.ingredients.data
+
+        for fieldname, value in form.data.items():
+            print(fieldname, ": ", value)
+
         if Cocktail.query.filter_by(name=name).all():
             flash("Cocktail already exists")
             return redirect(url_for('.create'))
@@ -35,12 +42,31 @@ def create():
             db.session.commit()
             ct = Cocktail.query.filter_by(name=name).first()
             print(ct)
-            ing = Ingredient(cocktail_key=ct.key, name=ing_1, quantity=quant_1)
-            print(ing)
-            db.session.add(ing)
+            ing1 = Ingredient(cocktail_key=ct.key, name=ing_1, quantity=quant_1)
+            ing2 = Ingredient(cocktail_key=ct.key, name=ing_2, quantity=quant_2)
+            print(ing1)
+            db.session.add(ing1)
+            db.session.add(ing2)
+
+            for key in ingredients.keys():
+                numb = "".join(x for x in key if x.isdigit())
+                name = f"ing_name_{numb}"
+                quant = f"quantity_{numb}"
+                if key == 'csrf_token':
+                    print('token')
+                    pass
+                elif ingredients[key][quant] == '' or ingredients[key][name] == '':
+                    print('pass')
+                    pass
+                else:
+                    print(f"name: {ingredients[key][name]}, quant: {ingredients[key][quant]}")
+                    new_ing = Ingredient(cocktail_key=ct.key, name=ingredients[key][name], quantity=ingredients[key][quant])
+                    db.session.add(new_ing)
+
             db.session.commit()
             flash('Cocktail created')
         except:
+            Cocktail.query.filter_by(name=name).delete()
             flash('Cocktail was not created')
         return redirect(url_for('.index'))
 

@@ -3,7 +3,6 @@
 {% block header %} Create Cocktails{% endblock %}
 {% block content %}
  <form action="" method="post" novalidate>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     {{ form.hidden_tag() }}
     <p>
         {{ form.name.label }}<br>
@@ -33,6 +32,40 @@
             <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
     </p>
+    <p>
+        {{ form.ing_name_2.label }}<br>
+        {{ form.ing_name_2(size=32) }}
+         {% for error in form.ing_name_2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+     <p>
+        {{ form.quantity_2.label }}<br>
+        {{ form.quantity_2(size=32) }}
+         {% for error in form.quantity_2.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+     </p>
+
+     {% for field in form.ingredients %}
+         <div class="ing_wrapper">
+         <p>
+         {% if field.name == "CSRF-TOKEN" %}
+         {% else %}
+        {{ field.label }}<br>
+        {{ field(size=32) }}
+         {% for error in field.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+             {% endfor %}
+         {% endif %}
+         </p>
+
+         </div>
+
+    {% endfor %}
+
+
+
     <p>{{ form.submit() }}</p>
  </form>
 
