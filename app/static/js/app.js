@@ -2,6 +2,7 @@
 window.addEventListener('load', function () {
     "use strict";
 
+
     $('#name').change(function () {
         let name = $(this).val();
         $.ajax({
@@ -17,8 +18,12 @@ window.addEventListener('load', function () {
     });
 
     let all_ings = document.querySelectorAll('.ing_wrapper');
+    let count = 0;
     for (let ing of all_ings) {
-        ing.style.display = "None";
+        if (count > 1){
+            ing.style.display = "None";
+        }
+        count++
     }
 
     let plus_sign = document.getElementById('plus_sign');
