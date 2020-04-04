@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>{%- block title %}{%- endblock title %}</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
 </head>
 <body>
-<nav>
-    <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('create') }}">Create</a>
-</nav>
-<hr>
+<div id="wrap_whole"  class="">
+
+
+<div class="sticky-top nav_buttons">
+    <div class="right nav_btn"><a  href="{{ url_for('index') }}">Home</a></div>
+    <div class="left nav_btn"><a href="{{ url_for('create') }}">Create</a></div>
+</div>
+
+
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <ul>
@@ -26,7 +32,10 @@
 <footer>
     <script src='../static/js/jQuery.js'></script>
     <script src='../static/js/app.js'></script>
+    <script src='../static/js/bootstrap.js'></script>
+    <script src='../static/js/bootstrap.bundle.js'></script>
     {% block javascript %}{% endblock %}
 </footer>
+</div>
 </body>
 </html>

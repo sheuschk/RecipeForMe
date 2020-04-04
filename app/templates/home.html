@@ -1,17 +1,28 @@
 {% extends "base.html" %}
 {% block title %} Home {% endblock %}
-{% block header %} Home site {% endblock %}
+{% block header %} All Cocktails {% endblock %}
 {% block content %}
-    <b>A List of Cocktails:</b>
+    <div id="cocktailList" class="">
     {% for cocktail in cocktails %}
-        <ul>
-            <li>Name: {{ cocktail.name }}</li>
-            <li>Description: {{ cocktail.desc }}</li>
-            {% for ing in ingredients[cocktail.name] %}
-                <li>Ingredient: {{ ing.name }}, Quantity: {{ ing.quantity }}</li>
-            {% endfor %}
-        </ul>
-    {% endfor %}
+        <article class="cocktail">
+            <h3>{{ cocktail.name }}</h3>
+            <hr>
+            <label>Description</label>
+            <article>{{ cocktail.desc }}</article>
+            <label>Ingredients</label>
+            <table class="ingredients">
+                <tbody>
+                {% for ing in ingredients[cocktail.name] %}
+                    <tr>
+                    <td>{{ ing.name }}</td>
+                    <td>{{ ing.quantity }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
 
+        </article>
+    {% endfor %}
+    </div>
 
 {% endblock %}

@@ -1,0 +1,102 @@
+
+
+#wrap_whole {
+
+    max-width: 700px;
+    margin: auto;
+}
+
+/* nav */
+
+.nav_buttons {
+    height: auto;
+    margin-bottom: 10px;
+}
+
+header {
+    text-align: center;
+}
+.nav_btn {
+    text-align: center;
+    text-decoration: none;
+    opacity: 0.7;
+    background: red;
+}
+
+.nav_btn a {
+    color: white;
+}
+
+.nav_btn a:hover {
+    color:black;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.left {
+    width:50%;
+    height:auto;
+    overflow:hidden;
+}
+.right {
+    height:auto ;
+    width:50%;
+    float:left;
+
+}
+
+/* Cocktail Card*/
+
+.cocktail {
+    margin: 2%;
+    margin-top: 5%;
+    padding: 2%;
+    border: gray;
+    border-style: solid;
+    border-width: medium;
+    border-radius: 4px;
+    background-color: rgba(255,0,0,0.2);
+
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+
+.cocktail:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.cocktail h3 {
+    text-align: center;
+}
+
+.cocktail article {
+    text-align: left;
+    border: black;
+    border-style: solid;
+    border-width: thin;
+    border-radius: 4px;
+    margin-left: 2%;
+    padding: 2px;
+    background-color: white ;
+}
+
+.cocktail table {
+
+}
+
+hr {
+    margin: auto;
+}
+
+
+#plus_sign {
+    margin-top: 5%;
+    width: 100%;
+    height: auto;
+    text-align:center;
+}
+
+#plus_sign img {
+    max-width: 15%;
+    height: auto;
+}
