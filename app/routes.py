@@ -24,10 +24,7 @@ def create():
     if form.validate_on_submit():
         name = form.name.data
         desc = form.desc.data
-        ing_1 = form.ing_name_1.data
-        quant_1 = form.quantity_1.data
-        ing_2 = form.ing_name_2.data
-        quant_2 = form.quantity_2.data
+
         ingredients = form.ingredients.data
 
         for fieldname, value in form.data.items():
@@ -46,11 +43,6 @@ def create():
             db.session.commit()
             ct = Cocktail.query.filter_by(name=name).first()
             print(ct)
-            ing1 = Ingredient(cocktail_key=ct.key, name=ing_1, quantity=quant_1)
-            ing2 = Ingredient(cocktail_key=ct.key, name=ing_2, quantity=quant_2)
-            print(ing1)
-            db.session.add(ing1)
-            db.session.add(ing2)
 
             for key in ingredients.keys():
                 numb = "".join(x for x in key if x.isdigit())
