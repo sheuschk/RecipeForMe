@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{#{% set active_page = "create" %}#}
 {% block title %} Create {% endblock %}
 {% block header %} Create Cocktails{% endblock %}
 {% block content %}
@@ -38,10 +39,12 @@
     <div id="plus_sign">
         <img src="../static/img/plus_sign.PNG">
     </div>
-
-
-
     <p>{{ form.submit(class_="btn btn-primary") }}</p>
  </form>
-
+    {% if request.endpoint != 'create' %}
+    <h4>Delete</h4>
+        <form action="" method="post" novalidat>
+        <p>{{ form2.submit(class_="btn btn-outline-danger") }}</p>
+        </form>
+    {% endif %}
 {% endblock %}

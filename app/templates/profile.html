@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-{% set active_page = "index" %}
-{% block title %} Home {% endblock %}
-{% block header %} All Cocktails {% endblock %}
+{% block title %} {{ title }} {% endblock %}
+{% block header %} {{ user.username }}'s Cocktails {% endblock %}
 {% block content %}
     <div id="cocktailList" class="">
     {% for cocktail in cocktails %}

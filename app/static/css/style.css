@@ -54,14 +54,15 @@ header {
     border-style: solid;
     border-width: medium;
     border-radius: 4px;
-    background-color: rgba(255,0,0,0.2);
+     /*background-color: rgba(255,0,0,0.2); */
+    background-color: rgba(44, 130, 201, 0.5);
 
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.5);
     transition: 0.3s;
 }
 
 .cocktail:hover {
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 16px 32px 0 rgba(0,0,0,0.5);
 }
 
 .cocktail h3 {
@@ -98,4 +99,14 @@ hr {
 #plus_sign img {
     max-width: 15%;
     height: auto;
+}
+
+
+nav {
+    text-align: center;
+}
+
+
+.edit_btn {
+    float: right;
 }

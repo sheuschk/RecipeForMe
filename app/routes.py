@@ -19,6 +19,7 @@ def index():
 
 
 @app.route('/create', methods=['GET', 'POST'])
+@login_required
 def create():
     form = CreateForm()
     if form.validate_on_submit():
@@ -34,7 +35,8 @@ def create():
             flash("Cocktail already exists")
             return redirect(url_for('.create'))
         try:
-            if current_user:
+            if current_user.is_authenticated:
+                print('hi')
                 cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id)
             else:
                 cocktail = Cocktail(name=name, desc=desc)
@@ -83,13 +85,16 @@ def validate_cocktail_name():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        print('here')
+        return redirect(url_for('user', username=current_user.username))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
+            print('hi')
             flash('Invalid username or password')
             return redirect(url_for('login'))
+        print('hallo')
         login_user(user, remember=form.remember_me.data)
         return redirect(url_for('index'))
     return render_template('login.html', title='Sign In', form=form)
@@ -116,11 +121,24 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-"""
-def create_blueprint():
-    
-    blueprint = Blueprint("", __name__, template_folder='templates')
-    blueprint.add_url_rule('/', 'index', index)
-    blueprint.add_url_rule('/create', 'create', create, methods=['GET', 'POST'])
-    return blueprint
-"""
+@app.route('/user/<username>', methods=['GET', 'POST'])
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    cocktails = Cocktail.query.filter_by(user_id=current_user.id).all()
+    ing_dict = {}
+    for ct in cocktails:
+        ings = ct.ingredients
+        ing_dict[ct.name] = ings
+
+    return render_template('profile.html', user=user, cocktails=cocktails, ingredients=ing_dict, title='Profile')
+
+
+@app.route('/cocktail/<name>')
+@login_required
+def cocktail(name):
+    cocktail = Cocktail.query.filter_by(name=name).first()
+    if cocktail.user_id != current_user.id:
+        return redirect('index')
+    form = CreateForm(obj=cocktail)
+    return render_template('create.html', form=form)

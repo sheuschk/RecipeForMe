@@ -15,6 +15,8 @@ class Cocktail(db.Model):
     def __repr__(self):
         return '<Cocktail: {}>'.format(self.name)
 
+    " A was_published_recently function with timestamps in teh Cocktail would be nice"
+
 
 class Ingredient(db.Model):
     __tablename__ = "ingredient"
