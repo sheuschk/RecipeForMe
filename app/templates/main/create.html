@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{#{% set active_page = "create" %}#}
+{% block title %} Create {% endblock %}
+{% block header %} Create Cocktails{% endblock %}
+{% block content %}
+ <form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <p  class="form-group">
+        {{ form.name.label }}<br>
+        {{ form.name(size=32, class_="form-control") }}
+        {% for error in form.name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+    <p  class="form-group">
+        {{ form.desc.label }}<br>
+        {{ form.desc(size=140, class_="form-control") }}
+        {% for error in form.desc.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+        {% endfor %}
+    </p>
+
+<!-- The code if all Ingredients are seperate forms -->
+
+     {% for field in form.ingredients %}
+         <div class="ing_wrapper form-group">
+
+         {% if field.name == "CSRF-TOKEN" %}
+         {% else %}
+            {{ field.label }}
+            {{ field(size=32) }}
+         {% for error in field.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+             {% endfor %}
+         {% endif %}
+         </div>
+    {% endfor %}
+
+
+ <!-- Code if all ingredients are directly in the form -->
+{#    <div class="ing_wrapper form-group">#}
+{#        {{ form.ing_name_1.label }}<br>#}
+{#        {{ form.ing_name_1(size=140, class_="form-control") }}#}
+{#        {% for error in form.ing_name_1.errors %}#}
+{#            <span style="color: red;">[{{ error }}]</span>#}
+{#        {% endfor %}#}
+{#        {{ form.quantity_1.label }}<br>#}
+{#        {{ form.quantity_1(size=140, class_="form-control") }}#}
+{#        {% for error in form.quantity_1.errors %}#}
+{#            <span style="color: red;">[{{ error }}]</span>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{##}
+{#    <div class="ing_wrapper form-group">#}
+{#        {{ form.ing_name_2.label }}<br>#}
+{#        {{ form.ing_name_2(size=140, class_="form-control") }}#}
+{#        {% for error in form.ing_name_2.errors %}#}
+{#            <span style="color: red;">[{{ error }}]</span>#}
+{#        {% endfor %}#}
+{#     {{ form.quantity_1.label }}<br>#}
+{#        {{ form.quantity_1(size=140, class_="form-control") }}#}
+{#        {% for error in form.quantity_1.errors %}#}
+{#            <span style="color: red;">[{{ error }}]</span>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{##}
+{#    <div class="ing_wrapper form-group">#}
+{#        {{ form.ing_name_3.label }}<br>#}
+{#        {{ form.ing_name_3(size=140, class_="form-control") }}#}
+{#        {% for error in form.ing_name_3.errors %}#}
+{#            <span style="color: red;">[{{ error }}]</span>#}
+{#        {% endfor %}#}
+{#        {{ form.quantity_1.label }}<br>#}
+{#        {{ form.quantity_1(size=140, class_="form-control") }}#}
+{#        {% for error in form.quantity_1.errors %}#}
+{#            <span style="color: red;">[{{ error }}]</span>#}
+{#        {% endfor %}#}
+{#    </div>#}
+
+    <div id="plus_sign">
+        <img src="../../static/img/plus_sign.PNG">
+    </div>
+  {% if request.endpoint != 'create' %}
+         <script>
+         document.querySelector('#plus_sign').style.display = 'none'
+         </script>
+        <p>{{ form.delete(class_="btn btn-outline-danger delete_btn") }}</p>
+    {% endif %}
+    <p>{{ form.submit(class_="btn btn-primary") }}</p>
+
+
+ </form>
+{% endblock %}

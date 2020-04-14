@@ -1,13 +1,14 @@
-from app import app, db
-from flask_login import current_user, login_user, logout_user, login_required
-from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request
-from .forms import CreateForm, LoginForm, RegistrationForm
+from app import db
+from flask_login import current_user, login_required
+from flask import render_template, redirect, url_for, flash, jsonify, request
+
+from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm
 from app.models import Cocktail, Ingredient, User
-# from requests import request
 
+from . import bp
 
-@app.route('/')
-@app.route('/index')
+@bp.route('/')
+@bp.route('/index')
 def index():
     cocktails = Cocktail.query.all()
     ing_dict = {}
@@ -15,10 +16,10 @@ def index():
         ings = ct.ingredients
         ing_dict[ct.name] = ings
 
-    return render_template('home.html', cocktails=cocktails, ingredients=ing_dict)
+    return render_template('main/home.html', cocktails=cocktails, ingredients=ing_dict)
 
 
-@app.route('/create', methods=['GET', 'POST'])
+@bp.route('/create', methods=['GET', 'POST'])
 @login_required
 def create():
     form = CreateForm()
@@ -33,7 +34,7 @@ def create():
 
         if Cocktail.query.filter_by(name=name).all():
             flash("Cocktail already exists")
-            return redirect(url_for('.create'))
+            return redirect(url_for('main.create'))
         try:
             if current_user.is_authenticated:
                 print('hi')
@@ -68,10 +69,10 @@ def create():
             flash('Cocktail was not created')
         return redirect(url_for('.index'))
 
-    return render_template('create.html', form=form)
+    return render_template('main/create.html', form=form)
 
 
-@app.route('/ajax/validate_cocktail/', methods=['GET'])
+@bp.route('/ajax/validate_cocktail/', methods=['GET'])
 def validate_cocktail_name():
     taken = False
     ct_name = request.args.get('cocktail_name', None)
@@ -82,46 +83,7 @@ def validate_cocktail_name():
     return jsonify(data)
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        print('here')
-        return redirect(url_for('user', username=current_user.username))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None or not user.check_password(form.password.data):
-            print('hi')
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-        print('hallo')
-        login_user(user, remember=form.remember_me.data)
-        return redirect(url_for('index'))
-    return render_template('login.html', title='Sign In', form=form)
-
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
-
-
-@app.route('/user/<username>', methods=['GET', 'POST'])
+@bp.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -131,14 +93,47 @@ def user(username):
         ings = ct.ingredients
         ing_dict[ct.name] = ings
 
-    return render_template('profile.html', user=user, cocktails=cocktails, ingredients=ing_dict, title='Profile')
+    return render_template('main/profile.html', user=user, cocktails=cocktails, ingredients=ing_dict, title='Profile')
 
 
-@app.route('/cocktail/<name>')
+@bp.route('/cocktail/<name>', methods=['GET', 'POST'])
 @login_required
 def cocktail(name):
     cocktail = Cocktail.query.filter_by(name=name).first()
+    if cocktail is None:
+        return redirect('../index')
     if cocktail.user_id != current_user.id:
-        return redirect('index')
-    form = CreateForm(obj=cocktail)
-    return render_template('create.html', form=form)
+        return redirect('../index')
+
+    form = EditCocktailForm(obj=cocktail)
+
+    if form.validate_on_submit():
+        if form.delete.data:
+            Cocktail.query.filter_by(name=cocktail.name).delete()
+            Ingredient.query.filter_by(cocktail_key=cocktail.key).delete()
+            db.session.commit()
+            flash(f'Cocktail {cocktail.name} deleted')
+            return redirect('../index')
+        else:
+            cocktail.name = form.name.data
+            cocktail.desc = form.desc.data
+            db.session.commit()
+            flash('Cocktail got changed')
+            return redirect('../index')
+
+    return render_template('main/create.html', form=form)
+
+
+@bp.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('main.user', username=current_user.username))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+    return render_template('main/edit_profile.html', title='Edit Profile',
+                           form=form)

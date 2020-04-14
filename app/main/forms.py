@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
-from .models import User
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, ValidationError
+from app.models import User
 import wtforms
 
 
@@ -72,32 +72,41 @@ class CreateForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     desc = StringField('Description', validators=[DataRequired()])
 
+    # ing_name_1 = StringField('Ingredient', validators=[DataRequired()])
+    # quantity_1 = StringField('Quantity', validators=[DataRequired()])
+    #
+    # ing_name_2 = StringField('Ingredient', validators=[DataRequired()])
+    # quantity_2 = StringField('Quantity', validators=[DataRequired()])
+    #
+    # ing_name_3 = StringField('Ingredient')
+    # quantity_3 = StringField('Quantity')
+
+
     ingredients = wtforms.FormField(AllIngredientForm)
 
     submit = SubmitField('Create')
+    delete = SubmitField('Delete')
 
 
-class LoginForm(FlaskForm):
+class EditCocktailForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    desc = StringField('Description', validators=[DataRequired()])
+
+    submit = SubmitField('Submit')
+    delete = SubmitField('Delete')
+
+
+class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Remember Me')
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Submit')
 
-
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Register')
+    def __init__(self, original_username, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.original_username = original_username
 
     def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different username.')
+        if username.data != self.original_username:
+            user = User.query.filter_by(username=self.username.data).first()
+            if user is not None:
+                raise ValidationError('Please use a different username.')
 
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')

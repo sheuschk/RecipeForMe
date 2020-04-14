@@ -1,0 +1,27 @@
+<article class="cocktail">
+            {% if cocktail.user_id == current_user.id %}
+                <a href={{ url_for('main.cocktail', name=cocktail.name) }} type="button" class="btn btn-outline-danger btn-sm edit_btn">Edit</a>
+            {% endif %}
+            <h3>{{ cocktail.name }}</h3>
+            <hr>
+            <label><u>Description</u></label>
+            <article>{{ cocktail.desc }}</article><br>
+            <label><u>Ingredients</u></label><br>
+            <table class=" table table-hover table-sm ingredients">
+            <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col"> Quantity</th>
+            </tr>
+            </thead>
+                <tbody>
+                {% for ing in ingredients[cocktail.name] %}
+                    <tr>
+                    <td {% if loop.index  != 0 %} scope="row" {% endif %}>{{ ing.name }}</td>
+                    <td>{{ ing.quantity }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+</article>

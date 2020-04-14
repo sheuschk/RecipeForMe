@@ -7,3 +7,16 @@ Just a help to remember cocktail recipes
 2. Install requirements.txt `pip install -r requirements.txt`
 3.Upgrade/ Create database file:   
 Start venv, go in wg_app dircetory and run `flask db upgrade` 
+
+## Tests
+Run tests, with activated venv:
+`py tests.py`
+
+## Test server for testing error mails:
+
+- in extra cmd with venv on:   
+  `py -m smtpd -n -c DebuggingServer localhost:8025`
+- extra cmd with venv on:
+`set FLASK_DEBUG=0  `
+`set MAIL_SERVER=localhost  `
+`set MAIL_PORT=8025`
