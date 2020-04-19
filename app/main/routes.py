@@ -7,6 +7,7 @@ from app.models import Cocktail, Ingredient, User
 
 from . import bp
 
+
 @bp.route('/')
 @bp.route('/index')
 def index():
@@ -127,13 +128,24 @@ def cocktail(name):
 @bp.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm(current_user.username)
+    form = EditProfileForm(current_user.username, current_user.email)
     if form.validate_on_submit():
+        if form.delete.data:
+            cocktails = Cocktail.query.filter_by(user_id=current_user.id).all()
+            for ct in cocktails:
+                Ingredient.query.filter_by(cocktail_key=ct.key).delete()
+                Cocktail.query.filter_by(name=ct.name).delete()
+            User.query.filter_by(username=current_user.username).delete()
+            db.session.commit()
+            flash('Your account is deleted')
+            return redirect(url_for('main.index'))
         current_user.username = form.username.data
+        current_user.email = form.email.data
         db.session.commit()
         flash('Your changes have been saved.')
         return redirect(url_for('main.user', username=current_user.username))
     elif request.method == 'GET':
         form.username.data = current_user.username
+        form.email.data = current_user.email
     return render_template('main/edit_profile.html', title='Edit Profile',
                            form=form)

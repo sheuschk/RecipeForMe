@@ -5,7 +5,7 @@
 {% block content %}
  <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
-    <p  class="form-group">
+    <p  class="form-group" data-ajax= "{{ url_for('main.validate_cocktail_name') }}">
         {{ form.name.label }}<br>
         {{ form.name(size=32, class_="form-control") }}
         {% for error in form.name.errors %}
@@ -78,9 +78,9 @@
 {#    </div>#}
 
     <div id="plus_sign">
-        <img src="../../static/img/plus_sign.PNG">
+        <img src=" {{ url_for( 'static', filename='img/plus_sign.PNG') }}">
     </div>
-  {% if request.endpoint != 'create' %}
+  {% if request.endpoint != 'main.create' %}
          <script>
          document.querySelector('#plus_sign').style.display = 'none'
          </script>

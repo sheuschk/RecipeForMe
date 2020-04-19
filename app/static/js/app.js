@@ -5,8 +5,10 @@ window.addEventListener('load', function () {
 
     $('#name').change(function () {
         let name = $(this).val();
+        let url = this.parentElement.getAttribute('data-ajax');
+        console.log(url);
         $.ajax({
-            url: '/ajax/validate_cocktail/',
+            url: url,
             data: {'cocktail_name': name},
             dataType: 'json',
             success: function (data) {
@@ -17,6 +19,7 @@ window.addEventListener('load', function () {
         })
     });
 
+
     let all_ings = document.querySelectorAll('.ing_wrapper');
     let count = 0;
     for (let ing of all_ings) {
@@ -25,6 +28,7 @@ window.addEventListener('load', function () {
         }
         count++
     }
+
 
     let plus_sign = document.getElementById('plus_sign');
     // plus_sign.style.display = 'block';
