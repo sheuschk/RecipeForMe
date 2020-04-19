@@ -1,6 +1,6 @@
 from app import db
 from flask_login import current_user, login_required
-from flask import render_template, redirect, url_for, flash, jsonify, request
+from flask import render_template, redirect, url_for, flash, jsonify, request, current_app
 
 from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm
 from app.models import Cocktail, Ingredient, User
@@ -11,13 +11,20 @@ from . import bp
 @bp.route('/')
 @bp.route('/index')
 def index():
-    cocktails = Cocktail.query.all()
+    page = request.args.get('page', 1, type=int)
+    cocktails = Cocktail.query.order_by(Cocktail.timestamp.desc()).paginate(
+        page, current_app.config['POSTS_PER_PAGE'], False)
     ing_dict = {}
-    for ct in cocktails:
+    for ct in cocktails.items:
         ings = ct.ingredients
         ing_dict[ct.name] = ings
 
-    return render_template('main/home.html', cocktails=cocktails, ingredients=ing_dict)
+    next_url = url_for('main.index', page=cocktails.next_num) \
+        if cocktails.has_next else None
+    prev_url = url_for('main.index', page=cocktails.prev_num) \
+        if cocktails.has_prev else None
+    return render_template('main/home.html', cocktails=cocktails.items, ingredients=ing_dict, next_url=next_url,
+                           prev_url=prev_url)
 
 
 @bp.route('/create', methods=['GET', 'POST'])

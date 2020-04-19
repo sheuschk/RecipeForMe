@@ -8,5 +8,12 @@
         {% include 'main/__cocktail_card.html' %}
     {% endfor %}
     </div>
-
+    <br>
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Newer Cocktails</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">Older Cocktails</a>
+    {% endif %}
+    <br>
 {% endblock %}

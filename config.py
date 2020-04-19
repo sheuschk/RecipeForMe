@@ -27,3 +27,5 @@ class Config(object):
 
     TESTING = os.environ.get('TESTING')
 
+    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
+

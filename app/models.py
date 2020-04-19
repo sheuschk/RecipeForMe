@@ -5,13 +5,16 @@ import jwt
 from sqlalchemy import Integer, ForeignKey, String
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 
 class Cocktail(db.Model):
     __tablename__ = 'cocktail'
+    __searchable__ = ['name']
     key = db.Column(Integer, primary_key=True)
     name = db.Column(String(64), index=True, unique=True)
     desc = db.Column(String(180), index=True)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     ingredients = db.relationship('Ingredient', backref='parent', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
