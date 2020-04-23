@@ -1,1 +1,1 @@
-FLASK_APP=wg_appcd.py
+FLASK_APP=wg_app.py
