@@ -1,0 +1,1 @@
+FLASK_APP=wg_app.py
