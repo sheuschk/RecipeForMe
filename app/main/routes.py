@@ -1,11 +1,15 @@
 from app import db
 from flask_login import current_user, login_required
-from flask import render_template, redirect, url_for, flash, jsonify, request, current_app
-
-from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm
+from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g
+from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm, SearchForm
 from app.models import Cocktail, Ingredient, User
 
 from . import bp
+
+
+@bp.before_app_request
+def before_request():
+    g.search_form = SearchForm()
 
 
 @bp.route('/')
@@ -25,6 +29,11 @@ def index():
         if cocktails.has_prev else None
     return render_template('main/home.html', cocktails=cocktails.items, ingredients=ing_dict, next_url=next_url,
                            prev_url=prev_url)
+
+
+@bp.route('/about')
+def about():
+    return render_template('main/about.html')
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -156,3 +165,37 @@ def edit_profile():
         form.email.data = current_user.email
     return render_template('main/edit_profile.html', title='Edit Profile',
                            form=form)
+
+
+@bp.route('/search/')
+def search():
+    term = request.args.get('term')
+    print(term)
+
+    page = request.args.get('page', 1, type=int)
+    filter_search = 'Cocktail'
+    if filter_search == 'Cocktail':
+        cocktails = Cocktail.query.filter(Cocktail.name.ilike(f'%{term}%')).paginate(
+        page, current_app.config['POSTS_PER_PAGE'], False)
+        ing_dict = {}
+        for ct in cocktails.items:
+            ings = ct.ingredients
+            ing_dict[ct.name] = ings
+
+    if filter_search == 'Ingredient':
+        ingredients = Ingredient.query.filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.cocktail_key)
+        cocktails = []
+        ing_dict = {}
+        for ing in ingredients:
+            cocktails.append(Cocktail.query.filter_by(key=ing.cocktail_key))
+        for ct in cocktails:
+            ings = ct.ingredients
+            ing_dict[ct.name] = ings
+
+    next_url = url_for('main.index', page=cocktails.next_num) \
+        if cocktails.has_next else None
+    prev_url = url_for('main.index', page=cocktails.prev_num) \
+        if cocktails.has_prev else None
+
+    return render_template('main/search.html', term=term)
+

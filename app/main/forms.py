@@ -118,3 +118,8 @@ class EditProfileForm(FlaskForm):
             mail = User.query.filter_by(email=self.email.data).first()
             if mail is not None:
                 raise ValidationError('Please use a different mail adresse.')
+
+
+class SearchForm(FlaskForm):
+    term = StringField('Search', validators=[DataRequired()])
+    submit = SubmitField('Search')

@@ -2,6 +2,10 @@
 {% set active_page = "index" %}
 {% block title %} Home {% endblock %}
 {% block header %} All Cocktails {% endblock %}
+{% block second_nav %}
+{% include 'main/__search_nav.html' %}
+{% endblock %}
+
 {% block content %}
     <div id="cocktailList" class="">
     {% for cocktail in cocktails %}

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>{%- block title %}{%- endblock title %}</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for( 'static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" />
@@ -9,16 +10,15 @@
 
 </head>
 <body>
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark justify-content-center sticky-top">
-
-    <div class="text-center">
-     <button class="navbar-toggler justify-content-center" type="button" data-toggle="collapse" data-target="#navbar_toggle"
-    aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark   sticky-top">
+    <a class="navbar-brand" href="" style="display: none"></a>
+    <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse" data-target="#navbar_toggle"
+             aria-controls="navbar_toggle" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
-    </div>
-    <div class="collapse navbar-collapse justify-content-center ul_div" id="navbar_toggle" >
-        <a class="navbar-brand" {% if current_user.is_authenticated %}
+
+    <div class="collapse navbar-collapse justify-content-center " id="navbar_toggle" >
+    <a class="navbar-brand" {% if current_user.is_authenticated %}
            href="{{ url_for('main.user', username=current_user.username )  }}"
         {% else %}
                    href="{{ url_for('auth.login') }}"
@@ -43,14 +43,15 @@
                 </a>
             </li>
         {% endif %}
-
         </ul>
     </div>
 </nav>
+{% block second_nav %}
+{% endblock %}
 
-<div id="wrap_whole"  class="">
-
-{##}
+<div id="wrap_whole" class="justify-content-center">
+<div id="margin_div">
+{# old nav buttons #}
 {#<div class="sticky-top nav_buttons">#}
 {#    <div class="right nav_btn"><a  href="{{ url_for('index') }}">Home</a></div>#}
 {#    <div class="left nav_btn"><a href="{{ url_for('create') }}">Create</a></div>#}
@@ -70,12 +71,17 @@
 {%- block content %}
 
 {%- endblock content %}
-<footer>
+<footer class="page-footer font-small blue fixed-bottom">
+    <div class="footer-copyright text-center py-3">Cocktails:
+        <a href="{{ url_for('main.about') }}"> About </a>
+    </div>
+
     <script src='{{ url_for('static', filename='js/jQuery.js') }}'></script>
     <script src='{{ url_for('static', filename='js/app.js') }}'></script>
     <script src='{{ url_for('static', filename='js/bootstrap.js') }}'></script>
     {% block javascript %}{% endblock %}
 </footer>
+</div>
 </div>
 </body>
 </html>

@@ -35,7 +35,6 @@ def create_app(config_class=Config):
 
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
-    print(app.config['POSTS_PER_PAGE'])
     if not app.debug:
         print(app.config['MAIL_SERVER'])
         print(app.config['MAIL_PORT'])

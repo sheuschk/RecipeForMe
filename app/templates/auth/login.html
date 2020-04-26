@@ -4,7 +4,7 @@
 {% block header %} Login {% endblock %}
 {% block content %}
 <p>New User? <a href="{{ url_for('auth.register') }}">Click to Register!</a></p>
-<form action="" method="post" novalidate>
+<form action="" method="post" novalidate class="container-fluid">
         {{ form.hidden_tag() }}
         <p>
             {{ form.username.label }}<br>
