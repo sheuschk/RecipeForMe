@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm, Form
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email
 from app.models import User
 import wtforms
@@ -122,4 +122,5 @@ class EditProfileForm(FlaskForm):
 
 class SearchForm(FlaskForm):
     term = StringField('Search', validators=[DataRequired()])
+    filter = SelectField(u'Cocktail', choices=[('Cocktail', 'Cocktail'), ('Ingredient', 'Ingredient')])
     submit = SubmitField('Search')

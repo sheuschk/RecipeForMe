@@ -56,3 +56,11 @@ window.addEventListener('load', function () {
     }
 
 });
+
+
+let form = document.getElementById('search_filter_form');
+form.onchange = check_field;
+function check_field(){
+    console.log('jump');
+    form.submit()
+}

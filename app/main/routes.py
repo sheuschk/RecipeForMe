@@ -10,6 +10,8 @@ from . import bp
 @bp.before_app_request
 def before_request():
     g.search_form = SearchForm()
+    if request.endpoint == 'main.search':
+        g.search_form = SearchForm(term=request.args.get('term'), filter=request.args.get('filter'))
 
 
 @bp.route('/')
@@ -169,11 +171,10 @@ def edit_profile():
 
 @bp.route('/search/')
 def search():
-    term = request.args.get('term')
-    print(term)
+    term = request.args.get('term', "")
+    filter_search = request.args.get('filter', "Cocktail")
 
     page = request.args.get('page', 1, type=int)
-    filter_search = 'Cocktail'
     if filter_search == 'Cocktail':
         cocktails = Cocktail.query.filter(Cocktail.name.ilike(f'%{term}%')).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
@@ -183,12 +184,11 @@ def search():
             ing_dict[ct.name] = ings
 
     if filter_search == 'Ingredient':
-        ingredients = Ingredient.query.filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.cocktail_key)
-        cocktails = []
+        ingredients = db.session.query(Ingredient.cocktail_key).filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.cocktail_key)
+        cocktails = Cocktail.query.filter(Cocktail.key.in_(ingredients)).paginate(
+        page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
-        for ing in ingredients:
-            cocktails.append(Cocktail.query.filter_by(key=ing.cocktail_key))
-        for ct in cocktails:
+        for ct in cocktails.items:
             ings = ct.ingredients
             ing_dict[ct.name] = ings
 
@@ -196,6 +196,6 @@ def search():
         if cocktails.has_next else None
     prev_url = url_for('main.index', page=cocktails.prev_num) \
         if cocktails.has_prev else None
-
-    return render_template('main/search.html', term=term)
+    return render_template('main/search.html', term=term, cocktails=cocktails.items, ingredients=ing_dict,
+                           next_url=next_url, prev_url=prev_url)
 

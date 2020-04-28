@@ -1,10 +1,11 @@
 {% if g.search_form %}
+
 <nav class="navbar navbar-light bg-light justify-content-center" id="search_nav">
-  <form class="bd-search d-flex align-items-center" method="get" action="{{ url_for('main.search') }}">
+<form class="bd-search d-flex " method="get" action="{{ url_for('main.search') }}">
 {#      <input class="form-control ds-input" type="search" placeholder="Search" aria-label="Search">#}
+{#      <button class="btn btn-outline-success my-2 col-xs-4" type="submit">Search</button>#}
       {{ g.search_form.term( class_="form-control ds-input") }}
-{#      {{ g.search_form.submit( class_="btn btn-outline-success my-2 col-xs-4") }}#}
-      <button class="btn btn-outline-success my-2 col-xs-4" type="submit">Search</button>
-  </form>
+      {{ g.search_form.submit( class_="btn btn-outline-success", type_="submit") }}
+ </form>
 </nav>
 {% endif %}

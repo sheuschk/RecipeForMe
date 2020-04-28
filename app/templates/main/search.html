@@ -1,8 +1,36 @@
 {% extends "base.html" %}
-{% set active_page = "index" %}
+{% set active_page = "search" %}
 {% block title %} Home {% endblock %}
 {% block header %}"{{ term }}"{% endblock %}
-{% block content %}
 
+{% block second_nav %}{% include 'main/__search_nav.html' %}{% endblock %}
+
+{% block content %}
+<form class="bd-search d-flex"  id="search_filter_form" method="get" action="{{ url_for('main.search') }}">
+{#      <input class="form-control ds-input" type="search" placeholder="Search" aria-label="Search">#}
+{#      <button class="btn btn-outline-success my-2 col-xs-4" type="submit">Search</button>#}
+      <div style="display: none">{{ g.search_form.term( class_="form-control ds-input", style_="display: none") }}</div>
+    {{ g.search_form.filter(class_="form-control")}}
+ </form>
+    {% if cocktails == [] %}
+        <br>
+        <br>
+        <h3>Sorry, no Cocktails found, try again</h3>
+
+     {% else %}
+        <div id="cocktailList" class="">
+        {% for cocktail in cocktails %}
+            {% include 'main/__cocktail_card.html' %}
+        {% endfor %}
+        </div>
+        <br>
+        {% if prev_url %}
+        <a href="{{ prev_url }}">Newer Cocktails</a>
+        {% endif %}
+        {% if next_url %}
+        <a href="{{ next_url }}">Older Cocktails</a>
+        {% endif %}
+        <br>
+    {% endif %}
 
 {% endblock %}
