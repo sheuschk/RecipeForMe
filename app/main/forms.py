@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, ValidationError, Email
+from flask_wtf.file import FileField, FileAllowed, FileRequired
+# from flask_uploads import UploadSet, IMAGES
 from app.models import User
 import wtforms
 
@@ -67,6 +69,8 @@ class AllIngredientForm(Form):
     ingredient9 = wtforms.FormField(Ingredient9Form)
     ingredient10 = wtforms.FormField(Ingredient10Form)
 
+# images = UploadSet('images', IMAGES)
+
 
 class CreateForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
@@ -81,8 +85,10 @@ class CreateForm(FlaskForm):
     # ing_name_3 = StringField('Ingredient')
     # quantity_3 = StringField('Quantity')
 
-
     ingredients = wtforms.FormField(AllIngredientForm)
+
+    # picture = FileField(validators=[FileRequired(), FileAllowed(images, 'Images only!')])
+    picture = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
 
     submit = SubmitField('Create')
     delete = SubmitField('Delete')
@@ -91,6 +97,7 @@ class CreateForm(FlaskForm):
 class EditCocktailForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     desc = StringField('Description', validators=[DataRequired()])
+    picture = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
 
     submit = SubmitField('Submit')
     delete = SubmitField('Delete')

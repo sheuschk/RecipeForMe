@@ -15,13 +15,14 @@ class Cocktail(db.Model):
     name = db.Column(String(64), index=True, unique=True)
     desc = db.Column(String(180), index=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    picture = db.Column(String(64), index=True, unique=True, default=None)
     ingredients = db.relationship('Ingredient', backref='parent', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Cocktail: {}>'.format(self.name)
 
-    " A was_published_recently function with timestamps in teh Cocktail would be nice"
+    " A was_published_recently function would be nice"
 
 
 class Ingredient(db.Model):

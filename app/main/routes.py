@@ -3,8 +3,11 @@ from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g
 from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm, SearchForm
 from app.models import Cocktail, Ingredient, User
-
 from . import bp
+from config import Config
+from datetime import datetime
+from werkzeug.utils import secure_filename
+import os
 
 
 @bp.before_app_request
@@ -45,39 +48,30 @@ def create():
     if form.validate_on_submit():
         name = form.name.data
         desc = form.desc.data
-
         ingredients = form.ingredients.data
-
-        for fieldname, value in form.data.items():
-            print(fieldname, ": ", value)
+        f = form.picture.data
 
         if Cocktail.query.filter_by(name=name).all():
             flash("Cocktail already exists")
             return redirect(url_for('main.create'))
+        filename = secure_filename(f.filename)
+        file = str(datetime.now().timestamp()).replace('.', '') + filename
         try:
-            if current_user.is_authenticated:
-                print('hi')
-                cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id)
-            else:
-                cocktail = Cocktail(name=name, desc=desc)
-            print(cocktail.name, type(cocktail.name))
+            f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
+            cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id, picture=file)
             db.session.add(cocktail)
             db.session.commit()
             ct = Cocktail.query.filter_by(name=name).first()
-            print(ct)
 
             for key in ingredients.keys():
                 numb = "".join(x for x in key if x.isdigit())
                 name = f"ing_name_{numb}"
                 quant = f"quantity_{numb}"
                 if key == 'csrf_token':
-                    print('token')
                     pass
                 elif ingredients[key][quant] == '' or ingredients[key][name] == '':
-                    print('pass')
                     pass
                 else:
-                    print(f"name: {ingredients[key][name]}, quant: {ingredients[key][quant]}")
                     new_ing = Ingredient(cocktail_key=ct.key, name=ingredients[key][name], quantity=ingredients[key][quant])
                     db.session.add(new_ing)
 
@@ -85,6 +79,8 @@ def create():
             flash('Cocktail created')
         except:
             Cocktail.query.filter_by(name=name).delete()
+            if os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file)):
+                os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
             flash('Cocktail was not created')
         return redirect(url_for('.index'))
 
@@ -105,14 +101,20 @@ def validate_cocktail_name():
 @bp.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
+    page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    cocktails = Cocktail.query.filter_by(user_id=current_user.id).all()
+    cocktails = Cocktail.query.filter_by(user_id=current_user.id).order_by(Cocktail.timestamp.desc()).paginate(
+        page, current_app.config['POSTS_PER_PAGE'], False)
     ing_dict = {}
-    for ct in cocktails:
+    for ct in cocktails.items:
         ings = ct.ingredients
         ing_dict[ct.name] = ings
-
-    return render_template('main/profile.html', user=user, cocktails=cocktails, ingredients=ing_dict, title='Profile')
+    next_url = url_for('main.index', page=cocktails.next_num) \
+        if cocktails.has_next else None
+    prev_url = url_for('main.index', page=cocktails.prev_num) \
+        if cocktails.has_prev else None
+    return render_template('main/profile.html', user=user, cocktails=cocktails.items, ingredients=ing_dict, title='Profile',
+                           next_url=next_url, prev_url=prev_url)
 
 
 @bp.route('/cocktail/<name>', methods=['GET', 'POST'])
@@ -128,6 +130,9 @@ def cocktail(name):
 
     if form.validate_on_submit():
         if form.delete.data:
+            if cocktail.picture:
+                os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
+                os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
             Cocktail.query.filter_by(name=cocktail.name).delete()
             Ingredient.query.filter_by(cocktail_key=cocktail.key).delete()
             db.session.commit()
@@ -136,6 +141,16 @@ def cocktail(name):
         else:
             cocktail.name = form.name.data
             cocktail.desc = form.desc.data
+            if form.picture.data != cocktail.picture:
+                f = form.picture.data
+                filename = secure_filename(f.filename)
+                file = str(datetime.now().timestamp()).replace('.', '') + filename
+                f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
+                if cocktail.picture:
+                    os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
+                    os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
+                cocktail.picture = file
+
             db.session.commit()
             flash('Cocktail got changed')
             return redirect('../index')
@@ -151,6 +166,9 @@ def edit_profile():
         if form.delete.data:
             cocktails = Cocktail.query.filter_by(user_id=current_user.id).all()
             for ct in cocktails:
+                if ct.picture:
+                    os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
+                    os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
                 Ingredient.query.filter_by(cocktail_key=ct.key).delete()
                 Cocktail.query.filter_by(name=ct.name).delete()
             User.query.filter_by(username=current_user.username).delete()
@@ -176,6 +194,7 @@ def search():
 
     page = request.args.get('page', 1, type=int)
     if filter_search == 'Cocktail':
+
         cocktails = Cocktail.query.filter(Cocktail.name.ilike(f'%{term}%')).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}

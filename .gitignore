@@ -2,5 +2,6 @@
 /.idea
 */venv/*
 */notes/*
+*/photos/*
 *.sqlite
 *.env

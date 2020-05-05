@@ -4,6 +4,12 @@
             {% endif %}
             <h3>{{ cocktail.name }}</h3>
             <hr>
+            {% if cocktail.picture %}
+                <div >
+                <img class="cocktail_pic" src="{{ url_for('static', filename='/'.join(['photos', cocktail.picture]))  }}">
+                </div>
+                <hr>
+            {% endif %}
             <label><u>Description</u></label>
             <article>{{ cocktail.desc }}</article><br>
             <label><u>Ingredients</u></label><br>
