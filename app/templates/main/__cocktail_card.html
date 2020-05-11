@@ -5,7 +5,7 @@
             <h3>{{ cocktail.name }}</h3>
             <hr>
             {% if cocktail.picture %}
-                <div >
+                <div class="cocktail_div">
                 <img class="cocktail_pic" src="{{ url_for('static', filename='/'.join(['photos', cocktail.picture]))  }}">
                 </div>
                 <hr>

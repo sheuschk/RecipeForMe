@@ -49,16 +49,20 @@ def create():
         name = form.name.data
         desc = form.desc.data
         ingredients = form.ingredients.data
-        f = form.picture.data
 
         if Cocktail.query.filter_by(name=name).all():
             flash("Cocktail already exists")
             return redirect(url_for('main.create'))
-        filename = secure_filename(f.filename)
-        file = str(datetime.now().timestamp()).replace('.', '') + filename
+
         try:
-            f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
-            cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id, picture=file)
+            if form.picture.data is not None:
+                f = form.picture.data
+                filename = secure_filename(f.filename)
+                file = str(datetime.now().timestamp()).replace('.', '') + filename
+                f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
+                cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id, picture=file)
+            else:
+                cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id)
             db.session.add(cocktail)
             db.session.commit()
             ct = Cocktail.query.filter_by(name=name).first()
