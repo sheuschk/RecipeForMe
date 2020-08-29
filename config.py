@@ -8,7 +8,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 class Config(object):
 
-    SECRET_KEY = "".join(tuple(platform.uname()._asdict().values()) +
+    SECRET_KEY = os.environ.get('SECRET_KEY') or "".join(tuple(platform.uname()._asdict().values()) +
                          platform.python_build())
 
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -27,5 +27,6 @@ class Config(object):
 
     TESTING = os.environ.get('TESTING')
 
-    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
+    posts = os.environ.get('POSTS_PER_PAGE')
+    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE')) if posts else 10
 
