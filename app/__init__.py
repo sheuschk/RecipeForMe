@@ -8,7 +8,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 import os
-from elasticsearch import Elasticsearch
 
 db = SQLAlchemy()
 migrate = Migrate()
