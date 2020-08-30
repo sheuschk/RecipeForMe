@@ -30,3 +30,4 @@ class Config(object):
     posts = os.environ.get('POSTS_PER_PAGE')
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE')) if posts else 10
 
+    LOG_TO_STDOUT = os.environ.get('LOG_TO_STDOUT')
