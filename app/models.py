@@ -12,8 +12,8 @@ class Cocktail(db.Model):
     __tablename__ = 'cocktail'
     __searchable__ = ['name']
     key = db.Column(Integer, primary_key=True)
-    name = db.Column(String(64), index=True, unique=True)
-    desc = db.Column(String(180), index=True)
+    name = db.Column(String(100), index=True, unique=True)
+    desc = db.Column(String(400), index=True)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     picture = db.Column(String(64), index=True, unique=True, default=None)
     ingredients = db.relationship('Ingredient', backref='parent', lazy='dynamic')

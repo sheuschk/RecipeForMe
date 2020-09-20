@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm, Form
 from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, ValidationError, Email
+from wtforms.validators import DataRequired, ValidationError, Email, Length
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 # from flask_uploads import UploadSet, IMAGES
 from app.models import User
@@ -73,8 +73,8 @@ class AllIngredientForm(Form):
 
 
 class CreateForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    desc = StringField('Description', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
+    desc = StringField('Description', validators=[DataRequired(), Length(max=400)])
 
     # ing_name_1 = StringField('Ingredient', validators=[DataRequired()])
     # quantity_1 = StringField('Quantity', validators=[DataRequired()])
@@ -95,8 +95,8 @@ class CreateForm(FlaskForm):
 
 
 class EditCocktailForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    desc = StringField('Description', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
+    desc = StringField('Description', validators=[DataRequired(), Length(max=400)])
     picture = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
 
     submit = SubmitField('Submit')
