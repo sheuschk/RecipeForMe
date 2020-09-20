@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 class Recipe(db.Model):
-    __tablename__ = 'cocktail'
+    __tablename__ = 'recipe'
     __searchable__ = ['name']
     key = db.Column(Integer, primary_key=True)
     name = db.Column(String(100), index=True, unique=True)
@@ -20,7 +20,7 @@ class Recipe(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
-        return '<Cocktail: {}>'.format(self.name)
+        return '<Recipe: {}>'.format(self.name)
 
     " A was_published_recently function would be nice"
 
@@ -28,7 +28,7 @@ class Recipe(db.Model):
 class Ingredient(db.Model):
     __tablename__ = "ingredient"
     key = db.Column(Integer, primary_key=True)
-    cocktail_key = db.Column(Integer, ForeignKey('cocktail.key'))
+    cocktail_key = db.Column(Integer, ForeignKey('recipe.key'))
     name = db.Column(String, index=True)
     quantity = db.Column(String, index=True)
 
@@ -41,7 +41,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    cocktails = db.relationship('Cocktail', backref='author', lazy='dynamic')
+    cocktails = db.relationship('Recipe', backref='author', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
