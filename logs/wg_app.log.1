@@ -1,4 +1,4 @@
-2020-09-20 23:02:03,628 ERROR: Exception on / [GET] [in C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask\app.py:1890]
+2020-09-20 22:47:44,098 ERROR: Exception on / [GET] [in C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask\app.py:1890]
 Traceback (most recent call last):
   File "C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\sqlalchemy\engine\base.py", line 1245, in _execute_context
     self.dialect.do_execute(
@@ -55,7 +55,7 @@ FROM recipe ORDER BY recipe.timestamp DESC
  LIMIT ? OFFSET ?]
 [parameters: (10, 0)]
 (Background on this error at: http://sqlalche.me/e/e3q8)
-2020-09-20 23:02:12,698 ERROR: Exception on /index [GET] [in C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask\app.py:1890]
+2020-09-20 22:48:03,527 ERROR: Exception on /user/Simon [GET] [in C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask\app.py:1890]
 Traceback (most recent call last):
   File "C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\sqlalchemy\engine\base.py", line 1245, in _execute_context
     self.dialect.do_execute(
@@ -78,8 +78,10 @@ Traceback (most recent call last):
     rv = self.dispatch_request()
   File "C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask\app.py", line 1935, in dispatch_request
     return self.view_functions[rule.endpoint](**req.view_args)
-  File "C:\Users\simon\Projects\wg_app\app\main\routes.py", line 24, in index
-    cocktails = Recipe.query.order_by(Recipe.timestamp.desc()).paginate(
+  File "C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask_login\utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\Users\simon\Projects\wg_app\app\main\routes.py", line 110, in user
+    cocktails = Recipe.query.filter_by(user_id=current_user.id).order_by(Recipe.timestamp.desc()).paginate(
   File "C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\flask_sqlalchemy\__init__.py", line 496, in paginate
     items = self.limit(per_page).offset((page - 1) * per_page).all()
   File "C:\Users\simon\.virtualenvs\wg_app\lib\site-packages\sqlalchemy\orm\query.py", line 3233, in all
@@ -108,10 +110,17 @@ Traceback (most recent call last):
     cursor.execute(statement, parameters)
 sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such table: recipe
 [SQL: SELECT recipe."key" AS recipe_key, recipe.name AS recipe_name, recipe."desc" AS recipe_desc, recipe.timestamp AS recipe_timestamp, recipe.picture AS recipe_picture, recipe.user_id AS recipe_user_id 
-FROM recipe ORDER BY recipe.timestamp DESC
+FROM recipe 
+WHERE recipe.user_id = ? ORDER BY recipe.timestamp DESC
  LIMIT ? OFFSET ?]
-[parameters: (10, 0)]
+[parameters: (1, 10, 0)]
 (Background on this error at: http://sqlalche.me/e/e3q8)
-2020-09-20 23:02:33,928 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
-2020-09-20 23:07:28,857 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
-2020-09-20 23:09:34,798 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:49:11,829 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:49:22,667 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:56:48,010 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:58:19,126 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:58:26,949 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:58:37,516 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:58:51,371 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 22:59:08,338 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]
+2020-09-20 23:02:01,621 INFO: WG APP startup [in C:\Users\simon\Projects\wg_app\app\__init__.py:69]

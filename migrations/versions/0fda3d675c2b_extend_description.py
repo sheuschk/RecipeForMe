@@ -1,8 +1,8 @@
 """Extend Description
 
-Revision ID: 5225bc02c560
+Revision ID: 0fda3d675c2b
 Revises: 
-Create Date: 2020-09-20 22:40:33.990745
+Create Date: 2020-09-20 22:58:37.603203
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5225bc02c560'
+revision = '0fda3d675c2b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,7 +27,7 @@ def upgrade():
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
-    op.create_table('cocktail',
+    op.create_table('recipe',
     sa.Column('key', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=True),
     sa.Column('desc', sa.String(length=400), nullable=True),
@@ -37,16 +37,16 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('key')
     )
-    op.create_index(op.f('ix_cocktail_desc'), 'cocktail', ['desc'], unique=False)
-    op.create_index(op.f('ix_cocktail_name'), 'cocktail', ['name'], unique=True)
-    op.create_index(op.f('ix_cocktail_picture'), 'cocktail', ['picture'], unique=True)
-    op.create_index(op.f('ix_cocktail_timestamp'), 'cocktail', ['timestamp'], unique=False)
+    op.create_index(op.f('ix_recipe_desc'), 'recipe', ['desc'], unique=False)
+    op.create_index(op.f('ix_recipe_name'), 'recipe', ['name'], unique=True)
+    op.create_index(op.f('ix_recipe_picture'), 'recipe', ['picture'], unique=True)
+    op.create_index(op.f('ix_recipe_timestamp'), 'recipe', ['timestamp'], unique=False)
     op.create_table('ingredient',
     sa.Column('key', sa.Integer(), nullable=False),
     sa.Column('cocktail_key', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('quantity', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['cocktail_key'], ['cocktail.key'], ),
+    sa.ForeignKeyConstraint(['cocktail_key'], ['recipe.key'], ),
     sa.PrimaryKeyConstraint('key')
     )
     op.create_index(op.f('ix_ingredient_name'), 'ingredient', ['name'], unique=False)
@@ -59,11 +59,11 @@ def downgrade():
     op.drop_index(op.f('ix_ingredient_quantity'), table_name='ingredient')
     op.drop_index(op.f('ix_ingredient_name'), table_name='ingredient')
     op.drop_table('ingredient')
-    op.drop_index(op.f('ix_cocktail_timestamp'), table_name='cocktail')
-    op.drop_index(op.f('ix_cocktail_picture'), table_name='cocktail')
-    op.drop_index(op.f('ix_cocktail_name'), table_name='cocktail')
-    op.drop_index(op.f('ix_cocktail_desc'), table_name='cocktail')
-    op.drop_table('cocktail')
+    op.drop_index(op.f('ix_recipe_timestamp'), table_name='recipe')
+    op.drop_index(op.f('ix_recipe_picture'), table_name='recipe')
+    op.drop_index(op.f('ix_recipe_name'), table_name='recipe')
+    op.drop_index(op.f('ix_recipe_desc'), table_name='recipe')
+    op.drop_table('recipe')
     op.drop_index(op.f('ix_user_username'), table_name='user')
     op.drop_index(op.f('ix_user_email'), table_name='user')
     op.drop_table('user')

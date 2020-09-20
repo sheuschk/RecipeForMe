@@ -1,9 +1,9 @@
 from app import create_app, db
-from app.models import Recipe, Ingredient
+from app.models import Cocktail, Ingredient
 
 app = create_app()
 
 
 @app.shell_context_processor
 def make_shell_context():
-    return {'db': db, 'Cocktail': Recipe, 'Ingredient': Ingredient}
+    return {'db': db, 'Cocktail': Cocktail, 'Ingredient': Ingredient}
