@@ -2,7 +2,7 @@ from app import db
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g
 from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm, SearchForm
-from app.models import Cocktail, Ingredient, User
+from app.models import Recipe, Ingredient, User
 from . import bp
 from config import Config
 from datetime import datetime
@@ -21,7 +21,7 @@ def before_request():
 @bp.route('/index')
 def index():
     page = request.args.get('page', 1, type=int)
-    cocktails = Cocktail.query.order_by(Cocktail.timestamp.desc()).paginate(
+    cocktails = Recipe.query.order_by(Recipe.timestamp.desc()).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
     ing_dict = {}
     for ct in cocktails.items:
@@ -50,7 +50,7 @@ def create():
         desc = form.desc.data
         ingredients = form.ingredients.data
 
-        if Cocktail.query.filter_by(name=name).all():
+        if Recipe.query.filter_by(name=name).all():
             flash("Cocktail already exists")
             return redirect(url_for('main.create'))
 
@@ -60,12 +60,12 @@ def create():
                 filename = secure_filename(f.filename)
                 file = str(datetime.now().timestamp()).replace('.', '') + filename
                 f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
-                cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id, picture=file)
+                cocktail = Recipe(name=name, desc=desc, user_id=current_user.id, picture=file)
             else:
-                cocktail = Cocktail(name=name, desc=desc, user_id=current_user.id)
+                cocktail = Recipe(name=name, desc=desc, user_id=current_user.id)
             db.session.add(cocktail)
             db.session.commit()
-            ct = Cocktail.query.filter_by(name=name).first()
+            ct = Recipe.query.filter_by(name=name).first()
 
             for key in ingredients.keys():
                 numb = "".join(x for x in key if x.isdigit())
@@ -82,7 +82,7 @@ def create():
             db.session.commit()
             flash('Cocktail created')
         except:
-            Cocktail.query.filter_by(name=name).delete()
+            Recipe.query.filter_by(name=name).delete()
             if os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file)):
                 os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
             flash('Cocktail was not created')
@@ -95,7 +95,7 @@ def create():
 def validate_cocktail_name():
     taken = False
     ct_name = request.args.get('cocktail_name', None)
-    exist = Cocktail.query.filter_by(name=ct_name).first()
+    exist = Recipe.query.filter_by(name=ct_name).first()
     if exist is not None:
         taken = True
     data = {'is_taken': taken}
@@ -107,7 +107,7 @@ def validate_cocktail_name():
 def user(username):
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    cocktails = Cocktail.query.filter_by(user_id=current_user.id).order_by(Cocktail.timestamp.desc()).paginate(
+    cocktails = Recipe.query.filter_by(user_id=current_user.id).order_by(Recipe.timestamp.desc()).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
     ing_dict = {}
     for ct in cocktails.items:
@@ -124,7 +124,7 @@ def user(username):
 @bp.route('/cocktail/<name>', methods=['GET', 'POST'])
 @login_required
 def cocktail(name):
-    cocktail = Cocktail.query.filter_by(name=name).first()
+    cocktail = Recipe.query.filter_by(name=name).first()
     if cocktail is None:
         return redirect('../index')
     if cocktail.user_id != current_user.id:
@@ -137,7 +137,7 @@ def cocktail(name):
             if cocktail.picture:
                 os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
                 os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
-            Cocktail.query.filter_by(name=cocktail.name).delete()
+            Recipe.query.filter_by(name=cocktail.name).delete()
             Ingredient.query.filter_by(cocktail_key=cocktail.key).delete()
             db.session.commit()
             flash(f'Cocktail {cocktail.name} deleted')
@@ -168,13 +168,13 @@ def edit_profile():
     form = EditProfileForm(current_user.username, current_user.email)
     if form.validate_on_submit():
         if form.delete.data:
-            cocktails = Cocktail.query.filter_by(user_id=current_user.id).all()
+            cocktails = Recipe.query.filter_by(user_id=current_user.id).all()
             for ct in cocktails:
                 if ct.picture:
                     os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
                     os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
                 Ingredient.query.filter_by(cocktail_key=ct.key).delete()
-                Cocktail.query.filter_by(name=ct.name).delete()
+                Recipe.query.filter_by(name=ct.name).delete()
             User.query.filter_by(username=current_user.username).delete()
             db.session.commit()
             flash('Your account is deleted')
@@ -199,7 +199,7 @@ def search():
     page = request.args.get('page', 1, type=int)
     if filter_search == 'Cocktail':
 
-        cocktails = Cocktail.query.filter(Cocktail.name.ilike(f'%{term}%')).paginate(
+        cocktails = Recipe.query.filter(Recipe.name.ilike(f'%{term}%')).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
         for ct in cocktails.items:
@@ -208,7 +208,7 @@ def search():
 
     if filter_search == 'Ingredient':
         ingredients = db.session.query(Ingredient.cocktail_key).filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.cocktail_key)
-        cocktails = Cocktail.query.filter(Cocktail.key.in_(ingredients)).paginate(
+        cocktails = Recipe.query.filter(Recipe.key.in_(ingredients)).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
         for ct in cocktails.items:

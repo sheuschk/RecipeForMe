@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 
-class Cocktail(db.Model):
+class Recipe(db.Model):
     __tablename__ = 'cocktail'
     __searchable__ = ['name']
     key = db.Column(Integer, primary_key=True)

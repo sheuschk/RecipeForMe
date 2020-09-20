@@ -1,8 +1,8 @@
-"""user, cocktailö and ingredient
+"""Extend Description
 
-Revision ID: aacc36dde219
+Revision ID: 5225bc02c560
 Revises: 
-Create Date: 2020-04-09 21:16:48.290857
+Create Date: 2020-09-20 22:40:33.990745
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'aacc36dde219'
+revision = '5225bc02c560'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,14 +29,18 @@ def upgrade():
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
     op.create_table('cocktail',
     sa.Column('key', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=64), nullable=True),
-    sa.Column('desc', sa.String(length=180), nullable=True),
+    sa.Column('name', sa.String(length=100), nullable=True),
+    sa.Column('desc', sa.String(length=400), nullable=True),
+    sa.Column('timestamp', sa.DateTime(), nullable=True),
+    sa.Column('picture', sa.String(length=64), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('key')
     )
     op.create_index(op.f('ix_cocktail_desc'), 'cocktail', ['desc'], unique=False)
     op.create_index(op.f('ix_cocktail_name'), 'cocktail', ['name'], unique=True)
+    op.create_index(op.f('ix_cocktail_picture'), 'cocktail', ['picture'], unique=True)
+    op.create_index(op.f('ix_cocktail_timestamp'), 'cocktail', ['timestamp'], unique=False)
     op.create_table('ingredient',
     sa.Column('key', sa.Integer(), nullable=False),
     sa.Column('cocktail_key', sa.Integer(), nullable=True),
@@ -55,6 +59,8 @@ def downgrade():
     op.drop_index(op.f('ix_ingredient_quantity'), table_name='ingredient')
     op.drop_index(op.f('ix_ingredient_name'), table_name='ingredient')
     op.drop_table('ingredient')
+    op.drop_index(op.f('ix_cocktail_timestamp'), table_name='cocktail')
+    op.drop_index(op.f('ix_cocktail_picture'), table_name='cocktail')
     op.drop_index(op.f('ix_cocktail_name'), table_name='cocktail')
     op.drop_index(op.f('ix_cocktail_desc'), table_name='cocktail')
     op.drop_table('cocktail')
