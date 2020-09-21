@@ -1,4 +1,4 @@
-### Simple Cocktail database
+# Simple Cocktail database
 Just a help to remember cocktail recipes 
 
 
@@ -8,11 +8,24 @@ Just a help to remember cocktail recipes
 3.Upgrade/ Create database file:   
 Start venv, go in wg_app dircetory and run `flask db upgrade` 
 
+## Requirements
+- python Version 3.8.5
+- git
+
+
+## Next steps:
+- User Management (Administration)
+- Export and Import Recipes as csv (for safety)
+  - not via cli,   via UI
+- Change Ingredients and a longer description 
+- Further changes to change from Cocktails to general Recipes
+- Write Tests
+
 ## Tests
 Run tests, with activated venv:
 `py tests.py`
 
-## Test server for testing error mails:
+### Test server for testing error mails:
 
 - in extra cmd with venv on:   
   `py -m smtpd -n -c DebuggingServer localhost:8025`
@@ -43,7 +56,7 @@ DATABASE_URL=postgresql+psycopg2://{user}:{pw}@{url}/{db}
 
 ## Deployment on Linux server:
 
-### Requirements  
+#### Requirements  
 - Linux Server with following packages
     - git: to get the project
     - supervisor: to run the project in the background and restarting after booting
@@ -51,7 +64,7 @@ DATABASE_URL=postgresql+psycopg2://{user}:{pw}@{url}/{db}
 - A database server if required: f.e. mysql-server or postgres
 `sudo apt-get -y install mysql-server postfix supervisor nginx git`
 
-### Installation:
+#### Installation:
 - get the project: `https://github.com/sheuschk/wg_app.git`
 - create a venv and start it
 - install requirements
@@ -62,7 +75,7 @@ DATABASE_URL=postgresql+psycopg2://{user}:{pw}@{url}/{db}
 `echo "export FLASK_APP=microblog.py" >> ~/.profile`
 - Create db: `flask db upgrade`
 
-### Starting:
+#### Starting:
 Running the application with supervisor. It restarts automatically after booting or if it crashes
 The Username ubuntu is your username 
 - `sudo nano /etc/supervisor/conf.d/wg_app.conf`  
@@ -76,7 +89,7 @@ stopasgroup=true
 killasgroup=true  
 - `sudo supervisorctl reload`
 
-### nginx
+#### nginx
 Make the application accessible for other devices
 - Create a certificat. For tests or development this can be a self signed certificat
 - `mkdir certs`
@@ -125,7 +138,7 @@ server {
 ````
 - `sudo service nginx reload`
 
-### Updating:
+#### Updating:
 ````
 $ git pull                              # download the new version
 $ sudo supervisorctl stop wg_app        # stop the current server
@@ -133,7 +146,7 @@ $ flask db upgrade                      # upgrade the database
 $ sudo supervisorctl start wg_app       # start a new server
 ````
 
-### Safety
+#### Safety
 - Install ufw (Uncomplicated firewall) and open just for ssh, http and https
 ````angular2html
 $ sudo apt-get install -y ufw

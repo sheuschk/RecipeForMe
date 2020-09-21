@@ -1,6 +1,6 @@
 from app import db
 from flask_login import current_user, login_required
-from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g
+from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g, send_file
 from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm, SearchForm
 from app.models import Cocktail, Ingredient, User
 from . import bp
@@ -8,6 +8,9 @@ from config import Config
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
+import csv
+from io import BytesIO, StringIO
+import zipfile
 
 
 @bp.before_app_request
@@ -222,3 +225,30 @@ def search():
     return render_template('main/search.html', term=term, cocktails=cocktails.items, ingredients=ing_dict,
                            next_url=next_url, prev_url=prev_url)
 
+
+@bp.route('/download_as_csv/')
+def download_as_csv():
+    """Functionality to download csv files with all recipes. Just admin """
+    """Problems are Ö,Ä, Ü """
+    fnames = ['name', 'desc', 'ing']
+    cts = Cocktail.query.all()
+    all_cocktails = []
+    for cocktail in cts:
+        save = {"name": cocktail.name, "desc": cocktail.desc, "ing": {}}
+        for ing in cocktail.ingredients:
+            save['ing'][ing.name] = ing.quantity
+        all_cocktails.append(save)
+    # Create in memory file like object
+    csv_file = StringIO()
+    writer = csv.DictWriter(csv_file, fieldnames=fnames)
+    for cocktail_str in all_cocktails:
+        writer.writerow(cocktail_str)
+
+    # create in memory file
+    zip_file = BytesIO()
+    with zipfile.ZipFile(zip_file, 'w') as zf:
+        data = zipfile.ZipInfo('this_data.zip')
+        data.compress_type = zipfile.ZIP_DEFLATED
+        zf.writestr('data.csv', csv_file.getvalue())
+    zip_file.seek(0)
+    return send_file(zip_file, attachment_filename='this_data.zip', as_attachment=True)
