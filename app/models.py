@@ -29,8 +29,8 @@ class Ingredient(db.Model):
     __tablename__ = "ingredient"
     key = db.Column(Integer, primary_key=True)
     cocktail_key = db.Column(Integer, ForeignKey('recipe.key'))
-    name = db.Column(String, index=True)
-    quantity = db.Column(String, index=True)
+    name = db.Column(String(100), index=True)
+    quantity = db.Column(String(100), index=True)
 
     def __repr__(self):
         return '<{}: {} of {}>'.format(self.name, self.quantity, self.cocktail_key)

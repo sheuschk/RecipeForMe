@@ -8,53 +8,53 @@ import wtforms
 
 
 class Ingredient1Form(Form):
-    ing_name_1 = StringField('Ingredient', validators=[DataRequired()])
-    quantity_1 = StringField('Quantity', validators=[DataRequired()])
+    ing_name_1 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_1 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient2Form(Form):
-    ing_name_2 = StringField('Ingredient', validators=[DataRequired()])
-    quantity_2 = StringField('Quantity', validators=[DataRequired()])
+    ing_name_2 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_2 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient3Form(Form):
-    ing_name_3 = StringField('Ingredient')
-    quantity_3 = StringField('Quantity')
+    ing_name_3 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_3 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient4Form(Form):
-    ing_name_4 = StringField('Ingredient')
-    quantity_4 = StringField('Quantity')
+    ing_name_4 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_4 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient5Form(Form):
-    ing_name_5 = StringField('Ingredient')
-    quantity_5 = StringField('Quantity')
+    ing_name_5 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_5 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient6Form(Form):
-    ing_name_6 = StringField('Ingredient')
-    quantity_6 = StringField('Quantity')
+    ing_name_6 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_6 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient7Form(Form):
-    ing_name_7 = StringField('Ingredient')
-    quantity_7 = StringField('Quantity')
+    ing_name_7 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_7 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient8Form(Form):
-    ing_name_8 = StringField('Ingredient')
-    quantity_8 = StringField('Quantity')
+    ing_name_8 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_8 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient9Form(Form):
-    ing_name_9 = StringField('Ingredient')
-    quantity_9 = StringField('Quantity')
+    ing_name_9 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_9 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class Ingredient10Form(Form):
-    ing_name_10 = StringField('Ingredient')
-    quantity_10 = StringField('Quantity')
+    ing_name_10 = StringField('Ingredient', validators=[Length(max=150)])
+    quantity_10 = StringField('Quantity', validators=[Length(max=100)])
 
 
 class AllIngredientForm(Form):
@@ -73,21 +73,11 @@ class AllIngredientForm(Form):
 
 
 class CreateForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
-    desc = StringField('Description', validators=[DataRequired(), Length(max=400)])
-
-    # ing_name_1 = StringField('Ingredient', validators=[DataRequired()])
-    # quantity_1 = StringField('Quantity', validators=[DataRequired()])
-    #
-    # ing_name_2 = StringField('Ingredient', validators=[DataRequired()])
-    # quantity_2 = StringField('Quantity', validators=[DataRequired()])
-    #
-    # ing_name_3 = StringField('Ingredient')
-    # quantity_3 = StringField('Quantity')
+    name = StringField('Name', validators=[DataRequired(), Length(max=150)])
+    desc = StringField('Description', validators=[DataRequired(), Length(max=500)])
 
     ingredients = wtforms.FormField(AllIngredientForm)
 
-    # picture = FileField(validators=[FileRequired(), FileAllowed(images, 'Images only!')])
     picture = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
 
     submit = SubmitField('Create')
@@ -95,8 +85,8 @@ class CreateForm(FlaskForm):
 
 
 class EditCocktailForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(), Length(max=100)])
-    desc = StringField('Description', validators=[DataRequired(), Length(max=400)])
+    name = StringField('Name', validators=[DataRequired(), Length(max=150)])
+    desc = StringField('Description', validators=[DataRequired(), Length(max=500)])
     picture = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!')])
 
     submit = SubmitField('Submit')
