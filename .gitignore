@@ -3,6 +3,7 @@
 */venv/*
 */notes/*
 */photos/*
+*/logs/*
 *.sqlite
 *.env
 heroku.txt
