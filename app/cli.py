@@ -1,5 +1,4 @@
 import click
-from app import db
 from app.models import Cocktail, Ingredient
 import json
 import csv
@@ -11,6 +10,7 @@ def register(app):
     @app.cli.group()
     def data():
         """Commands to progress data from the db"""
+        """Both commands are just for test purposes"""
         pass
 
     @data.command()
@@ -35,7 +35,7 @@ def register(app):
     @click.argument('name')
     def upload(name):
         """Upload an Excel with the Schema of the download and save them to the db"""
-        with open(f"{name}.csv", newline='') as csvfile:
+        with open(f"{name}.csv", newline='', encoding='utf8') as csvfile:
             reader = csv.DictReader(csvfile, fieldnames=fnames)
             for row in reader:
                 print(row['name'])

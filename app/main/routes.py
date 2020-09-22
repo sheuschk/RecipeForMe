@@ -228,8 +228,7 @@ def search():
 
 @bp.route('/download_as_csv/')
 def download_as_csv():
-    """Functionality to download csv files with all recipes. Just admin """
-    """Problems are Ö,Ä, Ü """
+    """Functionality to download csv files with all recipes utf8 encoded. Just admin """
     fnames = ['name', 'desc', 'ing']
     cts = Cocktail.query.all()
     all_cocktails = []
@@ -244,8 +243,9 @@ def download_as_csv():
     for cocktail_str in all_cocktails:
         writer.writerow(cocktail_str)
 
-    # create in memory file
     zip_file = BytesIO()
+    # create in memory file
+    print(csv_file.getvalue())
     with zipfile.ZipFile(zip_file, 'w') as zf:
         data = zipfile.ZipInfo('this_data.zip')
         data.compress_type = zipfile.ZIP_DEFLATED
