@@ -247,8 +247,8 @@ def download_as_csv():
     # create in memory file
     print(csv_file.getvalue())
     with zipfile.ZipFile(zip_file, 'w') as zf:
-        data = zipfile.ZipInfo('this_data.zip')
+        data = zipfile.ZipInfo('RecipeForMe.zip')
         data.compress_type = zipfile.ZIP_DEFLATED
-        zf.writestr('data.csv', csv_file.getvalue())
+        zf.writestr('recipes.csv', csv_file.getvalue())
     zip_file.seek(0)
     return send_file(zip_file, attachment_filename='this_data.zip', as_attachment=True)
