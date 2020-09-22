@@ -1,5 +1,5 @@
 import click
-from app.models import Cocktail, Ingredient
+from app.models import Recipe, Ingredient
 import json
 import csv
 
@@ -18,7 +18,7 @@ def register(app):
     def download(name):
         """Download all Cocktails and Ingredients as Excel"""
         # flask data download name
-        cts = Cocktail.query.all()
+        cts = Recipe.query.all()
         all_cocktails = []
         for cocktail in cts:
             save = {"name": cocktail.name, "desc": cocktail.desc, "ing": {}}
