@@ -1,6 +1,6 @@
 <article class="cocktail">
             {% if recipe.user_id == current_user.id %}
-                <a href={{ url_for('main.cocktail', name=recipe.name) }} type="button" class="btn btn-outline-danger btn-sm edit_btn">Edit</a>
+                <a href={{ url_for('main.recipe', name=recipe.name) }} type="button" class="btn btn-outline-danger btn-sm edit_btn">Edit</a>
             {% endif %}
             <h3>{{ recipe.name }}</h3>
             <hr>

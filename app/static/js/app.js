@@ -9,11 +9,11 @@ window.addEventListener('load', function () {
         console.log(url);
         $.ajax({
             url: url,
-            data: {'cocktail_name': name},
+            data: {'recipe_name': name},
             dataType: 'json',
             success: function (data) {
                 if (data.is_taken === true){
-                    alert('taken')
+                    alert('The Name is already taken')
                 }
             }
         })

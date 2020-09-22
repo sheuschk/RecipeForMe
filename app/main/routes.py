@@ -54,7 +54,7 @@ def create():
         ingredients = form.ingredients.data
 
         if Recipe.query.filter_by(name=name).all():
-            flash("Cocktail already exists")
+            flash("Recipe already exists")
             return redirect(url_for('main.create'))
 
         try:
@@ -63,12 +63,12 @@ def create():
                 filename = secure_filename(f.filename)
                 file = str(datetime.now().timestamp()).replace('.', '') + filename
                 f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
-                cocktail = Recipe(name=name, desc=desc, user_id=current_user.id, picture=file)
+                recipe = Recipe(name=name, desc=desc, user_id=current_user.id, picture=file)
             else:
-                cocktail = Recipe(name=name, desc=desc, user_id=current_user.id)
-            db.session.add(cocktail)
+                recipe = Recipe(name=name, desc=desc, user_id=current_user.id)
+            db.session.add(recipe)
             db.session.commit()
-            ct = Recipe.query.filter_by(name=name).first()
+            recipe_saved = Recipe.query.filter_by(name=name).first()
 
             for key in ingredients.keys():
                 numb = "".join(x for x in key if x.isdigit())
@@ -79,25 +79,25 @@ def create():
                 elif ingredients[key][quant] == '' or ingredients[key][name] == '':
                     pass
                 else:
-                    new_ing = Ingredient(cocktail_key=ct.key, name=ingredients[key][name], quantity=ingredients[key][quant])
+                    new_ing = Ingredient(cocktail_key=recipe_saved.key, name=ingredients[key][name], quantity=ingredients[key][quant])
                     db.session.add(new_ing)
 
             db.session.commit()
-            flash('Cocktail created')
+            flash('Recipe created')
         except:
             Recipe.query.filter_by(name=name).delete()
             if os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file)):
                 os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
-            flash('Cocktail was not created')
+            flash('Recipe was not created')
         return redirect(url_for('.index'))
 
     return render_template('main/create.html', form=form)
 
 
-@bp.route('/ajax/validate_cocktail/', methods=['GET'])
-def validate_cocktail_name():
+@bp.route('/ajax/validate_recipe/', methods=['GET'])
+def validate_recipe_name():
     taken = False
-    ct_name = request.args.get('cocktail_name', None)
+    ct_name = request.args.get('recipe_name', None)
     exist = Recipe.query.filter_by(name=ct_name).first()
     if exist is not None:
         taken = True
@@ -124,42 +124,46 @@ def user(username):
                            next_url=next_url, prev_url=prev_url)
 
 
-@bp.route('/cocktail/<name>', methods=['GET', 'POST'])
+@bp.route('/recipe/<name>', methods=['GET', 'POST'])
 @login_required
-def cocktail(name):
-    cocktail = Recipe.query.filter_by(name=name).first()
-    if cocktail is None:
+def recipe(name):
+    recipe = Recipe.query.filter_by(name=name).first()
+    if recipe is None:
         return redirect('../index')
-    if cocktail.user_id != current_user.id:
+    if recipe.user_id != current_user.id:
         return redirect('../index')
 
-    form = EditCocktailForm(obj=cocktail)
+    form = EditCocktailForm(obj=recipe)
 
     if form.validate_on_submit():
+        if Recipe.query.filter_by(name=name).all():
+            flash("Recipe Name already exists")
+            return redirect(url_for('main.recipe', name=recipe.name))
+
         if form.delete.data:
-            if cocktail.picture:
-                os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
-                os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
-            Recipe.query.filter_by(name=cocktail.name).delete()
-            Ingredient.query.filter_by(cocktail_key=cocktail.key).delete()
+            if recipe.picture:
+                os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', recipe.picture))
+                os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', recipe.picture))
+            Recipe.query.filter_by(name=recipe.name).delete()
+            Ingredient.query.filter_by(cocktail_key=recipe.key).delete()
             db.session.commit()
-            flash(f'Cocktail {cocktail.name} deleted')
+            flash(f'Recipe {recipe.name} deleted')
             return redirect('../index')
         else:
-            cocktail.name = form.name.data
-            cocktail.desc = form.desc.data
-            if form.picture.data != cocktail.picture:
+            recipe.name = form.name.data
+            recipe.desc = form.desc.data
+            if form.picture.data != recipe.picture:
                 f = form.picture.data
                 filename = secure_filename(f.filename)
                 file = str(datetime.now().timestamp()).replace('.', '') + filename
                 f.save(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', file))
-                if cocktail.picture:
-                    os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
-                    os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', cocktail.picture))
-                cocktail.picture = file
+                if recipe.picture:
+                    os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', recipe.picture))
+                    os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', recipe.picture))
+                recipe.picture = file
 
             db.session.commit()
-            flash('Cocktail got changed')
+            flash('Recipe got changed')
             return redirect('../index')
 
     return render_template('main/create.html', form=form)
