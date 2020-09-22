@@ -14,7 +14,7 @@ class Config(object):
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-                            'sqlite:///' + os.path.join(BASEDIR, 'wg_app.db')
+                            'sqlite:///' + os.path.join(BASEDIR, 'RecipeForMe.db')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
