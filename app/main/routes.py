@@ -24,18 +24,18 @@ def before_request():
 @bp.route('/index')
 def index():
     page = request.args.get('page', 1, type=int)
-    cocktails = Recipe.query.order_by(Recipe.timestamp.desc()).paginate(
+    recipes = Recipe.query.order_by(Recipe.timestamp.desc()).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
     ing_dict = {}
-    for ct in cocktails.items:
+    for ct in recipes.items:
         ings = ct.ingredients
         ing_dict[ct.name] = ings
 
-    next_url = url_for('main.index', page=cocktails.next_num) \
-        if cocktails.has_next else None
-    prev_url = url_for('main.index', page=cocktails.prev_num) \
-        if cocktails.has_prev else None
-    return render_template('main/home.html', cocktails=cocktails.items, ingredients=ing_dict, next_url=next_url,
+    next_url = url_for('main.index', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('main.index', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template('main/home.html', recipes=recipes.items, ingredients=ing_dict, next_url=next_url,
                            prev_url=prev_url)
 
 
@@ -110,17 +110,17 @@ def validate_cocktail_name():
 def user(username):
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
-    cocktails = Recipe.query.filter_by(user_id=current_user.id).order_by(Recipe.timestamp.desc()).paginate(
+    recipes = Recipe.query.filter_by(user_id=current_user.id).order_by(Recipe.timestamp.desc()).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
     ing_dict = {}
-    for ct in cocktails.items:
+    for ct in recipes.items:
         ings = ct.ingredients
         ing_dict[ct.name] = ings
-    next_url = url_for('main.index', page=cocktails.next_num) \
-        if cocktails.has_next else None
-    prev_url = url_for('main.index', page=cocktails.prev_num) \
-        if cocktails.has_prev else None
-    return render_template('main/profile.html', user=user, cocktails=cocktails.items, ingredients=ing_dict, title='Profile',
+    next_url = url_for('main.index', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('main.index', page=recipes.prev_num) \
+        if recipes.has_prev else None
+    return render_template('main/profile.html', user=user, recipes=recipes.items, ingredients=ing_dict, title='Profile',
                            next_url=next_url, prev_url=prev_url)
 
 
@@ -202,27 +202,28 @@ def search():
     page = request.args.get('page', 1, type=int)
     if filter_search == 'Cocktail':
 
-        cocktails = Recipe.query.filter(Recipe.name.ilike(f'%{term}%')).paginate(
+        recipes = Recipe.query.filter(Recipe.name.ilike(f'%{term}%')).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
-        for ct in cocktails.items:
+        for ct in recipes.items:
             ings = ct.ingredients
             ing_dict[ct.name] = ings
 
     if filter_search == 'Ingredient':
         ingredients = db.session.query(Ingredient.cocktail_key).filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.cocktail_key)
-        cocktails = Recipe.query.filter(Recipe.key.in_(ingredients)).paginate(
+        recipes = Recipe.query.filter(Recipe.key.in_(ingredients)).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
-        for ct in cocktails.items:
+        for ct in recipes.items:
             ings = ct.ingredients
             ing_dict[ct.name] = ings
 
-    next_url = url_for('main.index', page=cocktails.next_num) \
-        if cocktails.has_next else None
-    prev_url = url_for('main.index', page=cocktails.prev_num) \
-        if cocktails.has_prev else None
-    return render_template('main/search.html', term=term, cocktails=cocktails.items, ingredients=ing_dict,
+    next_url = url_for('main.index', page=recipes.next_num) \
+        if recipes.has_next else None
+    prev_url = url_for('main.index', page=recipes.prev_num) \
+        if recipes.has_prev else None
+
+    return render_template('main/search.html', term=term, recipes=recipes.items, ingredients=ing_dict,
                            next_url=next_url, prev_url=prev_url)
 
 
@@ -230,11 +231,11 @@ def search():
 def download_as_csv():
     """Functionality to download csv files with all recipes utf8 encoded. Just admin """
     fnames = ['name', 'desc', 'ing']
-    cts = Recipe.query.all()
+    recipes = Recipe.query.all()
     all_cocktails = []
-    for cocktail in cts:
-        save = {"name": cocktail.name, "desc": cocktail.desc, "ing": {}}
-        for ing in cocktail.ingredients:
+    for recipe in recipes:
+        save = {"name": recipe.name, "desc": recipe.desc, "ing": {}}
+        for ing in recipe.ingredients:
             save['ing'][ing.name] = ing.quantity
         all_cocktails.append(save)
     # Create in memory file like object

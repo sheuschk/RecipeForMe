@@ -12,23 +12,23 @@
       <div style="display: none">{{ g.search_form.term( class_="form-control ds-input", style_="display: none") }}</div>
     {{ g.search_form.filter(class_="form-control")}}
  </form>
-    {% if cocktails == [] %}
+    {% if recipes == [] %}
         <br>
         <br>
-        <h3>Sorry, no Cocktails found, try again</h3>
+        <h3>Sorry, no Recipes found, try again</h3>
 
      {% else %}
         <div id="cocktailList" class="">
-        {% for cocktail in cocktails %}
-            {% include 'main/__cocktail_card.html' %}
+        {% for recipe in recipes %}
+            {% include 'main/__recipe_card.html' %}
         {% endfor %}
         </div>
         <br>
         {% if prev_url %}
-        <a href="{{ prev_url }}">Newer Cocktails</a>
+        <a href="{{ prev_url }}">Newer Recipes</a>
         {% endif %}
         {% if next_url %}
-        <a href="{{ next_url }}">Older Cocktails</a>
+        <a href="{{ next_url }}">Older Recipes</a>
         {% endif %}
         <br>
     {% endif %}

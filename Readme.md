@@ -12,7 +12,12 @@ Start venv, go in wg_app dircetory and run `flask db upgrade`
 - python Version 3.8.5
 - git
 
+## Database
+To create changes:
+- flask db migrate -m "Message"
 
+To update the db schema:
+- flask db upgrade
 ## Next steps:
 - User Management (Administration)
 - Export and Import Recipes as csv (for safety)

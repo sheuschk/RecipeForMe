@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %} {{ title }} {% endblock %}
-{% block header %} {{ user.username }}'s Cocktails {% endblock %}
+{% block header %} {{ user.username }}'s Recipes {% endblock %}
 
 {% block second_nav %}
 {% include 'main/__search_nav.html' %}
@@ -9,8 +9,8 @@
 {% block content %}
     <p><a href="{{ url_for('main.edit_profile') }}">Edit your profile</a></p>
     <div id="cocktailList" class="">
-    {% for cocktail in cocktails %}
-        {% include 'main/__cocktail_card.html' %}
+    {% for recipe in recipes %}
+        {% include 'main/__recipe_card.html' %}
     {% endfor %}
     </div>
 

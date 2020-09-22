@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 {% set active_page = "index" %}
 {% block title %} Home {% endblock %}
-{% block header %} All Cocktails {% endblock %}
+{% block header %} All Recipes {% endblock %}
 {% block second_nav %}
 {% include 'main/__search_nav.html' %}
 {% endblock %}
 
 {% block content %}
     <div id="cocktailList" class="">
-    {% for cocktail in cocktails %}
-        {% include 'main/__cocktail_card.html' %}
+    {% for recipe in recipes %}
+        {% include 'main/__recipe_card.html' %}
     {% endfor %}
     </div>
+    <br>
+        {% if prev_url %}
+        <a href="{{ prev_url }}">Newer Recipes</a>
+        {% endif %}
+        {% if next_url %}
+        <a href="{{ next_url }}">Older Recipes</a>
+        {% endif %}
+        <br>
 {% endblock %}

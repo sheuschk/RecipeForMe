@@ -1,17 +1,17 @@
 <article class="cocktail">
-            {% if cocktail.user_id == current_user.id %}
-                <a href={{ url_for('main.cocktail', name=cocktail.name) }} type="button" class="btn btn-outline-danger btn-sm edit_btn">Edit</a>
+            {% if recipe.user_id == current_user.id %}
+                <a href={{ url_for('main.cocktail', name=recipe.name) }} type="button" class="btn btn-outline-danger btn-sm edit_btn">Edit</a>
             {% endif %}
-            <h3>{{ cocktail.name }}</h3>
+            <h3>{{ recipe.name }}</h3>
             <hr>
-            {% if cocktail.picture %}
+            {% if recipe.picture %}
                 <div class="cocktail_div">
-                <img class="cocktail_pic" src="{{ url_for('static', filename='/'.join(['photos', cocktail.picture]))  }}">
+                <img class="cocktail_pic" src="{{ url_for('static', filename='/'.join(['photos', recipe.picture]))  }}">
                 </div>
                 <hr>
             {% endif %}
             <label><u>Description</u></label>
-            <article>{{ cocktail.desc }}</article><br>
+            <article>{{ recipe.desc }}</article><br>
             <label><u>Ingredients</u></label><br>
             <table class=" table table-hover table-sm ingredients">
             <thead>
@@ -21,7 +21,7 @@
             </tr>
             </thead>
                 <tbody>
-                {% for ing in ingredients[cocktail.name] %}
+                {% for ing in ingredients[recipe.name] %}
                     <tr>
                     <td {% if loop.index  != 0 %} scope="row" {% endif %}>{{ ing.name }}</td>
                     <td>{{ ing.quantity }}</td>
