@@ -1,7 +1,7 @@
 from app import db
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g, send_file
-from app.main.forms import CreateForm, EditCocktailForm, EditProfileForm, SearchForm
+from app.main.forms import CreateForm, EditRecipeForm, EditProfileForm, SearchForm
 from app.models import Recipe, Ingredient, User
 from . import bp
 from config import Config
@@ -52,6 +52,7 @@ def create():
         name = form.name.data
         desc = form.desc.data
         ingredients = form.ingredients.data
+        file = ""
 
         if Recipe.query.filter_by(name=name).all():
             flash("Recipe already exists")
@@ -79,7 +80,7 @@ def create():
                 elif ingredients[key][quant] == '' or ingredients[key][name] == '':
                     pass
                 else:
-                    new_ing = Ingredient(cocktail_key=recipe_saved.key, name=ingredients[key][name], quantity=ingredients[key][quant])
+                    new_ing = Ingredient(recipe_key=recipe_saved.key, name=ingredients[key][name], quantity=ingredients[key][quant])
                     db.session.add(new_ing)
 
             db.session.commit()
@@ -133,22 +134,26 @@ def recipe(name):
     if recipe.user_id != current_user.id:
         return redirect('../index')
 
-    form = EditCocktailForm(obj=recipe)
+    form = EditRecipeForm(obj=recipe)
 
     if form.validate_on_submit():
-        if Recipe.query.filter_by(name=name).all():
-            flash("Recipe Name already exists")
-            return redirect(url_for('main.recipe', name=recipe.name))
+
+        # Check of the title is edit and already taken
+        if form.name.data != name:
+            if Recipe.query.filter_by(name=form.name.data).all():
+                flash("Recipe Name already exists")
+                return redirect(url_for('main.recipe', name=recipe.name))
 
         if form.delete.data:
             if recipe.picture:
                 os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', recipe.picture))
                 os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', recipe.picture))
             Recipe.query.filter_by(name=recipe.name).delete()
-            Ingredient.query.filter_by(cocktail_key=recipe.key).delete()
+            Ingredient.query.filter_by(recipe_key=recipe.key).delete()
             db.session.commit()
             flash(f'Recipe {recipe.name} deleted')
             return redirect('../index')
+
         else:
             recipe.name = form.name.data
             recipe.desc = form.desc.data
@@ -180,7 +185,7 @@ def edit_profile():
                 if ct.picture:
                     os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
                     os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
-                Ingredient.query.filter_by(cocktail_key=ct.key).delete()
+                Ingredient.query.filter_by(recipe_key=ct.key).delete()
                 Recipe.query.filter_by(name=ct.name).delete()
             User.query.filter_by(username=current_user.username).delete()
             db.session.commit()
@@ -214,7 +219,7 @@ def search():
             ing_dict[ct.name] = ings
 
     if filter_search == 'Ingredient':
-        ingredients = db.session.query(Ingredient.cocktail_key).filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.cocktail_key)
+        ingredients = db.session.query(Ingredient.recipe_key).filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.recipe_key)
         recipes = Recipe.query.filter(Recipe.key.in_(ingredients)).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
@@ -236,17 +241,17 @@ def download_as_csv():
     """Functionality to download csv files with all recipes utf8 encoded. Just admin """
     fnames = ['name', 'desc', 'ing']
     recipes = Recipe.query.all()
-    all_cocktails = []
+    all_recipes = []
     for recipe in recipes:
         save = {"name": recipe.name, "desc": recipe.desc, "ing": {}}
         for ing in recipe.ingredients:
             save['ing'][ing.name] = ing.quantity
-        all_cocktails.append(save)
+        all_recipes.append(save)
     # Create in memory file like object
     csv_file = StringIO()
     writer = csv.DictWriter(csv_file, fieldnames=fnames)
-    for cocktail_str in all_cocktails:
-        writer.writerow(cocktail_str)
+    for recipe_str in all_recipes:
+        writer.writerow(recipe_str)
 
     zip_file = BytesIO()
     # create in memory file

@@ -84,7 +84,7 @@ class CreateForm(FlaskForm):
     delete = SubmitField('Delete')
 
 
-class EditCocktailForm(FlaskForm):
+class EditRecipeForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=150)])
     desc = StringField('Description', validators=[DataRequired(), Length(max=500)])
     picture = FileField(validators=[FileAllowed(['jpg', 'png'], 'Images only!')])

@@ -28,12 +28,12 @@ class Recipe(db.Model):
 class Ingredient(db.Model):
     __tablename__ = "ingredient"
     key = db.Column(Integer, primary_key=True)
-    cocktail_key = db.Column(Integer, ForeignKey('recipe.key'))
+    recipe_key = db.Column(Integer, ForeignKey('recipe.key'))
     name = db.Column(String(100), index=True)
     quantity = db.Column(String(100), index=True)
 
     def __repr__(self):
-        return '<{}: {} of {}>'.format(self.name, self.quantity, self.cocktail_key)
+        return '<{}: {} of {}>'.format(self.name, self.quantity, self.recipe_key)
 
 
 class User(UserMixin, db.Model):
