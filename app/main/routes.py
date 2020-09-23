@@ -1,16 +1,17 @@
 from app import db
 from flask_login import current_user, login_required
 from flask import render_template, redirect, url_for, flash, jsonify, request, current_app, g, send_file
-from app.main.forms import CreateForm, EditRecipeForm, EditProfileForm, SearchForm
+from app.main.forms import CreateForm, EditRecipeForm, SearchForm, UploadCSV
 from app.models import Recipe, Ingredient, User
 from . import bp
 from config import Config
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
-import csv
 from io import BytesIO, StringIO
 import zipfile
+import json
+import tempfile
 
 
 @bp.before_app_request
@@ -174,43 +175,15 @@ def recipe(name):
     return render_template('main/create.html', form=form)
 
 
-@bp.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm(current_user.username, current_user.email)
-    if form.validate_on_submit():
-        if form.delete.data:
-            cocktails = Recipe.query.filter_by(user_id=current_user.id).all()
-            for ct in cocktails:
-                if ct.picture:
-                    os.path.exists(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
-                    os.remove(os.path.join(Config.BASEDIR, 'app', 'static', 'photos', ct.picture))
-                Ingredient.query.filter_by(recipe_key=ct.key).delete()
-                Recipe.query.filter_by(name=ct.name).delete()
-            User.query.filter_by(username=current_user.username).delete()
-            db.session.commit()
-            flash('Your account is deleted')
-            return redirect(url_for('main.index'))
-        current_user.username = form.username.data
-        current_user.email = form.email.data
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('main.user', username=current_user.username))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-    return render_template('main/edit_profile.html', title='Edit Profile',
-                           form=form)
-
-
 @bp.route('/search/')
 def search():
+    """Search function for recipes and ingredients"""
     term = request.args.get('term', "")
     filter_search = request.args.get('filter', "Cocktail")
-
     page = request.args.get('page', 1, type=int)
-    if filter_search == 'Cocktail':
 
+    # Search for Recipes (default)
+    if filter_search == 'Cocktail':
         recipes = Recipe.query.filter(Recipe.name.ilike(f'%{term}%')).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
         ing_dict = {}
@@ -218,6 +191,7 @@ def search():
             ings = ct.ingredients
             ing_dict[ct.name] = ings
 
+    # Search for Ingredients
     if filter_search == 'Ingredient':
         ingredients = db.session.query(Ingredient.recipe_key).filter(Ingredient.name.ilike(f'%{term}%')).distinct(Ingredient.recipe_key)
         recipes = Recipe.query.filter(Recipe.key.in_(ingredients)).paginate(
@@ -227,6 +201,7 @@ def search():
             ings = ct.ingredients
             ing_dict[ct.name] = ings
 
+    # Create Links if more Recipes are found then POST_PER_PAGE allows
     next_url = url_for('main.index', page=recipes.next_num) \
         if recipes.has_next else None
     prev_url = url_for('main.index', page=recipes.prev_num) \
@@ -236,29 +211,63 @@ def search():
                            next_url=next_url, prev_url=prev_url)
 
 
-@bp.route('/download_as_csv/')
-def download_as_csv():
-    """Functionality to download csv files with all recipes utf8 encoded. Just admin """
-    fnames = ['name', 'desc', 'ing']
+@bp.route('/download_json/')
+def download_json():
+    """Functionality to download json files with all recipes utf8 encoded. Just admin """
+
+    # Create json string
     recipes = Recipe.query.all()
-    all_recipes = []
+    all_recipes = {
+        'all_recipes': []
+    }
     for recipe in recipes:
         save = {"name": recipe.name, "desc": recipe.desc, "ing": {}}
         for ing in recipe.ingredients:
             save['ing'][ing.name] = ing.quantity
-        all_recipes.append(save)
-    # Create in memory file like object
-    csv_file = StringIO()
-    writer = csv.DictWriter(csv_file, fieldnames=fnames)
-    for recipe_str in all_recipes:
-        writer.writerow(recipe_str)
+        all_recipes['all_recipes'].append(save)
 
+    # Create in memory file like object
+    temp = tempfile.TemporaryFile()
+    dict_b = bytes(json.dumps(all_recipes).encode('utf8'))
+    temp.write(dict_b)
+    temp.seek(0)
+
+    # Create in memory zip file
     zip_file = BytesIO()
-    # create in memory file
-    print(csv_file.getvalue())
     with zipfile.ZipFile(zip_file, 'w') as zf:
         data = zipfile.ZipInfo('RecipeForMe.zip')
         data.compress_type = zipfile.ZIP_DEFLATED
-        zf.writestr('recipes.csv', csv_file.getvalue())
+        zf.writestr('recipes.json', temp.read())
     zip_file.seek(0)
-    return send_file(zip_file, attachment_filename='this_data.zip', as_attachment=True)
+    return send_file(zip_file, attachment_filename='RecipeForMe.zip', as_attachment=True)
+
+
+@login_required
+@bp.route('/upload_json/', methods=['GET', 'POST'])
+def upload_json():
+    """Upload a json file to fill the database"""
+    form = UploadCSV()
+    if form.validate_on_submit():
+        # Get dictionary out of the file
+        content = form.csv_file.data.stream.read().decode("utf-8")
+        recipe_json = json.loads(content)
+
+        # Save every entry as recipe
+        for rp_dict in recipe_json['all_recipes']:
+            # Check if Recipe with same name already exists
+            if Recipe.query.filter_by(name=rp_dict['name']).all():
+                continue
+            else:
+                # Save the Recipe
+                recipe = Recipe(name=rp_dict['name'], desc=rp_dict['desc'], user_id=current_user.id)
+                db.session.add(recipe)
+                db.session.commit()
+                recipe_saved = Recipe.query.filter_by(name=rp_dict['name']).first()
+
+                for ing in rp_dict['ing'].keys():
+                    new_ing = Ingredient(recipe_key=recipe_saved.key, name=ing,
+                                         quantity=rp_dict['ing'][ing])
+                    db.session.add(new_ing)
+                db.session.commit()
+        return redirect(url_for('main.index'))
+    return render_template('main/json_upload.html', form=form)

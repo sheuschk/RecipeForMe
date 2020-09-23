@@ -84,6 +84,11 @@ class CreateForm(FlaskForm):
     delete = SubmitField('Delete')
 
 
+class UploadCSV(FlaskForm):
+    csv_file = FileField(validators=[FileRequired(), FileAllowed(['json'], 'Json only!')])
+    submit = SubmitField('Upload')
+
+
 class EditRecipeForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(max=150)])
     desc = StringField('Description', validators=[DataRequired(), Length(max=500)])
@@ -91,30 +96,6 @@ class EditRecipeForm(FlaskForm):
 
     submit = SubmitField('Submit')
     delete = SubmitField('Delete')
-
-
-class EditProfileForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Submit')
-    delete = SubmitField('Delete')
-
-    def __init__(self, original_username, original_mail, *args, **kwargs):
-        super(EditProfileForm, self).__init__(*args, **kwargs)
-        self.original_username = original_username
-        self.original_mail = original_mail
-
-    def validate_username(self, username):
-        if username.data != self.original_username:
-            user = User.query.filter_by(username=self.username.data).first()
-            if user is not None:
-                raise ValidationError('Please use a different username.')
-
-    def validate_email(self, email):
-        if email.data != self.original_mail:
-            mail = User.query.filter_by(email=self.email.data).first()
-            if mail is not None:
-                raise ValidationError('Please use a different mail adresse.')
 
 
 class SearchForm(FlaskForm):

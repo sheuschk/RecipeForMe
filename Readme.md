@@ -18,13 +18,47 @@ To create changes:
 
 To update the db schema:
 - flask db upgrade
+
+The database has an alembic table as memory for migrations. If the migrations have a bug, 
+the db needs to be deleted as well
+
 ## Next steps:
-- User Management (Administration)
-- Export and Import Recipes as csv (for safety)
-  - not via cli,   via UI
-- Change Ingredients and a longer description 
+#### User Management 
+- Administration with rights (admin and User)
+- Own blueprint for user with consistent url Design  /User/<id>/profile or /User/<id>/edit_profile
+- Change password form on edit_profile
+
+#### Data consistency
+- Export and Import Recipes as json (for safety), improve bugs 
+(f.e. ings with same name in one recipe get delete by dictionary keys)
+- Download recipes as csv for users
+
+  
+#### Recipes
+- Make Ingredients changeable
 - Further changes to change from Cocktails to general Recipes
-- Write Tests
+
+#### Tests
+- functional Tests with selenium
+- unit tests
+
+## Functionalities
+#### Authentication
+- Registration
+- Login
+- Profile
+- Mail Support for password reset
+
+#### Recipes
+- Creation of Recipes
+- Change of name and description (not ingredients)
+- Profile to see all recipes
+- Pagination of recipes
+- Search for Ingredient or Recipe
+
+#### Download
+- Download all recipes in json format (duplicate ingredient in one recipe get deleted, pictures getting deleted)
+- Upload json file to save recipes
 
 ## Tests
 Run tests, with activated venv:
