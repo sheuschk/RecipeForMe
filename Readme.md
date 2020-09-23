@@ -1,5 +1,5 @@
-# Simple Cocktail database
-Just a help to remember cocktail recipes 
+# Simple Recipe database
+Just a help to remember Recipes. 
 
 
 ## Installation
