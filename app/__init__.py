@@ -8,6 +8,10 @@ import logging
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 import os
+from repo.base import AbstractRepository
+from repo import create_repository
+from typing import Optional
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -17,12 +21,27 @@ login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page.'
 
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
-    app.config.from_object(config_class)
+class RecipeForMe(Flask):
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+    def __init__(self, import_name: str):
+        """Initialize the application object."""
+        super().__init__(import_name)
+        self._repository: Optional[AbstractRepository] = None
+
+    def setup_repository(self) -> None:
+        self._repository = create_repository(self.config['DATABASE_URL'])
+
+        # Setup another repository if the application gets tested
+
+
+def create_app(config_class=Config):
+    # app = Flask(__name__)
+    app = RecipeForMe(__name__)
+    app.config.from_object(config_class)
+    app.setup_repository()
+    print(app._repository)
+    # db.init_app(app)
+    # migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
 
