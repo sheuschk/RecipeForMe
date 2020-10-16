@@ -1,5 +1,13 @@
 
 
+class ConnectionAPI:  # pylint: disable=too-many-public-methods
+    """Abstract connection to a reposity."""
+
+    def close(self, success: bool) -> None:
+        """Close the connection, store all permanent data."""
+        raise NotImplementedError("Connection.close")
+
+
 class AbstractRepository:
     """ An Abstract repository. It consists of the funtionalities, the database specific Sub Classes need to have"""
 
@@ -18,12 +26,9 @@ class AbstractRepository:
         """Initialize the repository, if needed."""
         raise NotImplementedError("Repository.initialize.")
 
+    def create(self) -> ConnectionAPI:
+        """Create and setup a connection."""
+        raise NotImplementedError("Repository.create")
 
-class Connection:  # pylint: disable=too-many-public-methods
-    """Abstract connection to a reposity."""
-
-    def close(self, success: bool) -> None:
-        """Close the connection, store all permanent data."""
-        raise NotImplementedError("Connection.close")
 
 

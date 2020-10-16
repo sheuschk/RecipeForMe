@@ -1,4 +1,4 @@
-from .base import AbstractRepository, Connection
+from .base import AbstractRepository, ConnectionAPI
 from typing import Optional, Sequence, Any
 from .models import User
 import psycopg2
@@ -10,6 +10,7 @@ class PostgresRepository(AbstractRepository):
     def __init__(self, repository_url: str):
         super().__init__(repository_url)
         self.connection = None
+        self.connection_class_api = PostgresConnectionAPI
 
     def _connect(self):
         """ Build a connection to the """
@@ -55,8 +56,12 @@ class PostgresRepository(AbstractRepository):
 
         return True
 
+    def create(self) -> ConnectionAPI:
+        """ Create a ConnectionAPI object with an open connection"""
+        return self.connection_class_api(self._connect())
 
-class PostgresConnectionAPI(Connection):
+
+class PostgresConnectionAPI(ConnectionAPI):
 
     def __init__(self, connection):
         self._connection = connection

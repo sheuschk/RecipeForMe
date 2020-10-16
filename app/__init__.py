@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, g
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -8,9 +8,9 @@ import logging
 from logging.handlers import RotatingFileHandler
 from logging.handlers import SMTPHandler
 import os
-from repo.base import AbstractRepository
+from repo.base import AbstractRepository, ConnectionAPI
 from repo import create_repository
-from typing import Optional
+from typing import Optional, cast
 
 
 db = SQLAlchemy()
@@ -32,6 +32,15 @@ class RecipeForMe(Flask):
         self._repository = create_repository(self.config['DATABASE_URL'])
 
         # Setup another repository if the application gets tested
+
+    def get_connection(self) -> ConnectionAPI:
+        """Return an open connection, specific for this request. This function gets called in the business logic.
+        with current_app.get_connection"""
+        if 'connection' not in g:
+            if self._repository is None:
+                raise TypeError("Repository not set")
+            g.connection = self._repository.create()
+        return cast(ConnectionAPI, g.connection)
 
 
 def create_app(config_class=Config):
