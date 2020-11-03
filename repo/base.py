@@ -3,7 +3,7 @@
 class ConnectionAPI:  # pylint: disable=too-many-public-methods
     """Abstract connection to a reposity."""
 
-    def close(self, success: bool) -> None:
+    def close(self) -> None:
         """Close the connection, store all permanent data."""
         raise NotImplementedError("Connection.close")
 

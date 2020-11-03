@@ -31,8 +31,6 @@ the db needs to be deleted as well
 #### Data consistency
 - Export and Import Recipes as json (for safety), improve bugs 
 (f.e. ings with same name in one recipe get delete by dictionary keys)
-- Download recipes as csv for users
-
   
 #### Recipes
 - Make Ingredients changeable

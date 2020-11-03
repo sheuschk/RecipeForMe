@@ -13,7 +13,7 @@ class Config(object):
 
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
-    DATABASE_URL = 'postgres:nothing'
+    # DATABASE_URL = {'type': 'postgres', 'host': 'localhost', 'user': 'postgres', 'password': '123', 'port': '9876'}
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
                             'sqlite:///' + os.path.join(BASEDIR, 'RecipeForMe.db')

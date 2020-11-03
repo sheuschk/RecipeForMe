@@ -1,4 +1,4 @@
-from  .base import AbstractRepository
+from .base import AbstractRepository, ConnectionAPI
 from typing import Optional
 
 
@@ -18,3 +18,6 @@ class DummyRepository(AbstractRepository):
         """Initialize the repository, if needed."""
         return True
 
+    def create(self) -> ConnectionAPI:
+        """Initialize the repository, if needed."""
+        return ConnectionAPI()

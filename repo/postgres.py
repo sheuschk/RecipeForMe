@@ -14,46 +14,48 @@ class PostgresRepository(AbstractRepository):
 
     def _connect(self):
         """ Build a connection to the """
-        # 1. Step get params out of the url
-        connection_param_dict = self.parse_postgres_url(self.repo_url)
-        # 2. Step: Build a connection with psycopg2
-        # 3. Step :set self_connection to the build connection
-        # 3.Step: return the connection
-        return self.connection
+        try:
+            con = psycopg2.connect(host=self.repo_url['host'],
+                                   user=self.repo_url['user'],
+                                   password=self.repo_url['pw'],
+                                   database=self.repo_url['database'])
+            return con
 
-    @staticmethod
-    def parse_postgres_url(repo_url):
-        """ Parse the params necessary to connect to postgres database"""
-        # 1.Step: Parse url
-        # 2 Step: Save it in correct form
-        # connection_param_dict = {user: "", pw: "", host: "", db_name: ""}
-        # return connection_param_dict
-        return repo_url
+        except psycopg2.OperationalError:
+            return self.connection
+
+        except Exception:
+            # 3. Step :set self_connection to the build connection
+            # 3.Step: return the connection
+            return self.connection
 
     def can_connect(self) -> bool:
         """ Try to build a connection. It's a validation, if true the repo can be initialized,
          if not an error or Dummy repo is needed"""
-
-        # build a connection and execute SELECT name FROM sqlite_master
-        return True
+        con = self._connect()
+        if con:
+            if getattr(con, 'closed') == 0:
+                return True
+            else:
+                return False
+        return False
 
     def initialize(self) -> bool:
         """Initialize the repository, if needed."""
-        # 1.Step: Try to Connect
-        # if not connection:
-        #   return False
+        con = self._connect()
+        if not con:
+            return False
+        cursor = con.cursor()
+        try:
+            cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ")
 
-        # 2. Step: Try to get table schema for every table which does not exist. Create it
-        # cursor = connection.cursor()
-        # try:
-        #     cursor.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
-        #     tables = {row[0] for row in cursor.fetchall()}
-        # if "users" not in tables:
-        #     cursor.execute("""
-        # CREATE TABLE users(
-        #     ...)
-        # """)
-
+            tables = {row[0] for row in cursor.fetchall()}
+            if "users" not in tables:
+                # enter sql schema to initialise the application
+                pass
+        finally:
+            cursor.close()
+            con.commit()
         return True
 
     def create(self) -> ConnectionAPI:
@@ -66,20 +68,28 @@ class PostgresConnectionAPI(ConnectionAPI):
     def __init__(self, connection):
         self._connection = connection
 
-    def close(self, success: bool):
+    def close(self):
         """Close the connection."""
-        if success:
-            self._execute("COMMIT")
         if self._connection is not None:
             self._connection.close()
         self._connection = None
 
-    def _execute(
-            self, sql: str, values: Sequence[Any] = ()):
+    def _execute_one(self, sql_query: str, values: Sequence[Any] = ()):
         """Execute a SQL command."""
         if self._connection is None:
             raise TypeError("SQLite connection is None")
-        return self._connection.execute(sql, values)
+
+        cur = self._connection.cursor()
+        cur.execute(sql_query, values)
+        row = cur.fetchone()
+        cur.close()
+        return row
+
+    def _execute(self, sql_query: str, values: Sequence[Any] = ()):
+        cur = self._connection.cursor()
+        cur.execute(sql_query, values)
+        cur.close()
+        self._connection.commit()
 
     def get_user_by_ident(self, ident: str):
         """Get a User by his identification"""

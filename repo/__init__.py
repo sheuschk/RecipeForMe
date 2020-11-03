@@ -18,8 +18,12 @@ def url_parse(repo_url: str):
 
 def create_repository(repo_url: str) -> AbstractRepository:
     """Repository Factory"""
+    if not repo_url:
+        repository = DummyRepository(
+            "dummy:", f"Repo url is not correct {repo_url}")
+        return repository
 
-    db_type = url_parse(repo_url)
+    db_type = repo_url['type']
     try:
         repository = REPOSITORY_DIRECTORY[db_type](repo_url)
         # for postgres port, pw etc is needed so url should be a class or dict. Not only
